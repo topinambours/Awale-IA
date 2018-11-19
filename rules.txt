@@ -1,0 +1,5 @@
+6 holes/player
+2 colors, red and black
+18 seeds/color
+1 special seed is both red and black.
+declare moves in the form "5RS2"
