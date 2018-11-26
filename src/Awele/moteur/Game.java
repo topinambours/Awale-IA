@@ -2,13 +2,11 @@ package Awele.moteur;
 
 
 public class Game {
-    private int[] blackHoles;
-    private int[] redHoles;
-    private int specialHole;
+    private int[] blackSeeds;
+    private int[] redSeeds;
+    private int specialSeed;
     private int score1;
     private int score2;
-
-
 
     public Game() {
 
@@ -16,28 +14,25 @@ public class Game {
         score2 = 0;
 
         for (int i = 1; i <=12;i++){
-            blackHoles[i] = 3;
-            redHoles[i] = 3;
+            blackSeeds[i] = 3;
+            redSeeds[i] = 3;
         }
     }
 
+}
 
+class GameState {
+    private int[] blackSeeds;
+    private int[] redSeeds;
+    private int specialSeed;
+    private int score1;
+    private int score2;
 
-    public void vider(int id, int special, String couleur){
-        if (couleur == "black"){
-            int i = 1;
-            while (blackHoles[id] > 0){
-                int index = id;
-                if index 
-                blackHoles[id+1] += 1;
-            }
+    public GameState() {
+        score1 = 0;
+        score2 = 0;
 
-            vider(id,special,"rouge");
-        }else{
-
-        }
-
+        //blackSeeds[12] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
+        //redSeeds = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
     }
-
-
 }
