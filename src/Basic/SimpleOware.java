@@ -3,6 +3,7 @@ package Basic;
 import Awele.moteur.Game;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SimpleOware {
@@ -11,8 +12,10 @@ public class SimpleOware {
 
         int currentPlayer = 1;
         boolean maximisingPlayer = true;
+        int nextMove;
         while (!GameState.gameOver(game, currentPlayer)) {
-            int nextMove = game.minimax(game, 7, currentPlayer, maximisingPlayer);
+            System.out.println(Arrays.toString(game.legalMoves(currentPlayer).toArray()));
+            nextMove = game.minimax(game, 1, currentPlayer, true);
             game = game.applyMove(nextMove, currentPlayer, true);
             currentPlayer = GameState.nextPlayer(currentPlayer);
             maximisingPlayer = !maximisingPlayer;
@@ -28,7 +31,7 @@ class GameState {
     public int score2;
 
     public GameState() {
-        seeds = new int[]{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4};
+        seeds = new int[]{4, 4, 4, 4, 4, 1, 4, 4, 4, 4, 4, 4};
         score1 = 0;
         score2 = 0;
     }
@@ -78,12 +81,13 @@ class GameState {
 
     public GameState capture(int[] seeds, int lastPos, int firstPos, int playerNo, boolean print) {
         boolean fail = false;
-        int i = lastPos;
+        int i = lastPos - firstPos;
+        if (i < 0) i += 12;
         int count = 0;
-        while (!fail && (i >= firstPos)) {
-            if (seeds[i] == 2 || seeds[i] == 3) {
+        while (fail != true && (i >= 0)) {
+            if (seeds[(firstPos + i) % 12] == 2 || seeds[(firstPos + i) % 12] == 3) {
                 count += seeds[i];
-                seeds[i] = 0;
+                seeds[(firstPos + i) % 12] = 0;
                 if (count > 0 && print) System.out.printf("Player %d captures %d seeds from hole %d.", playerNo, count, i);
                 i--;
             } else fail = true;
@@ -94,7 +98,7 @@ class GameState {
         return res;
     }
 
-    public int minimax(GameState node, int depth, int playerNo, boolean maximisingPlayer) {
+    /*public int minimax(GameState node, int depth, int playerNo, boolean maximisingPlayer) {
         int value;
         if (depth == 0 || gameOver(node, playerNo)) return evalNode(node, playerNo);
 
@@ -116,6 +120,13 @@ class GameState {
             }
             return value;
         }
+    }*/
+
+    public int minimax(GameState node, int depth, int playerNo, boolean meximisingPlayer) {
+        int value;
+        if (depth == 0 || gameOver(node, playerNo)) return evalNode(node, playerNo);
+        List<GameState> newNodes  = new ArrayList<>();
+        List<Integer> moves = node.legalMoves(playerNo)
     }
 
     public int evalNode(GameState node, int playerNo) {
