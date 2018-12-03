@@ -3,20 +3,36 @@ package Basic;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class SimpleOware {
     public static void main(String[] args) {
+
+        play(true);
+    }
+
+    static void play(boolean computerStart) {
         GameState game = new GameState();
 
+        boolean robotPlay = computerStart;
         int currentPlayer = 1;
-        boolean maximisingPlayer = true;
         MinimaxResult nextMove;
-        while (!GameState.gameOver(game, currentPlayer)) {
-            System.out.println(Arrays.toString(game.legalMoves(currentPlayer).toArray()));
-            nextMove = game.minimax(game, 5, currentPlayer, true);
+
+        while(!GameState.gameOver(game, currentPlayer)) {
+            if (robotPlay) {
+                System.out.println(Arrays.toString(game.legalMoves(currentPlayer).toArray()));
+                nextMove = game.minimax(game, 6, currentPlayer, true);
+            } else {
+                System.out.println(game.toString());
+                System.out.printf("Taper le numéro de la cellule à jouer:\n");
+                Scanner in = new Scanner(System.in);
+                nextMove = new MinimaxResult(0, in.nextInt());
+            }
+
             game = game.applyMove(nextMove.position, currentPlayer, true);
             currentPlayer = GameState.nextPlayer(currentPlayer);
-            maximisingPlayer = !maximisingPlayer;
+            robotPlay = !robotPlay;
+
         }
 
         System.out.printf("Partie terminée! Score joueur 1: %d, score joueur 2: %d\n", game.score1, game.score2);
@@ -30,7 +46,7 @@ class GameState {
     public int lastMove;
 
     public GameState() {
-        seeds = new int[]{4, 4, 4, 4, 4, 1, 4, 4, 4, 4, 4, 4};
+        seeds = new int[]{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4};
         score1 = 0;
         score2 = 0;
         lastMove = -1;
@@ -86,6 +102,13 @@ class GameState {
         if (i < 0) i += 12;
         int count = 0;
         while (fail != true && (i >= 0)) {
+            if (playerNo == 1 && (firstPos + i) % 12 < 6) {
+                fail = true;
+                break;
+            } else if (playerNo == 2 && (firstPos + i) % 12 > 5) {
+                fail = true;
+                break;
+            }
             if (seeds[(firstPos + i) % 12] == 2 || seeds[(firstPos + i) % 12] == 3) {
                 count += seeds[i];
                 seeds[(firstPos + i) % 12] = 0;
@@ -99,14 +122,14 @@ class GameState {
         return res;
     }
 
-    public MinimaxResult minimax(GameState node, int depth, int playerNo, boolean maximisingPlayer) {
-        if (depth == 0 || gameOver(node, playerNo)) return new MinimaxResult(evalNode(node, playerNo), node.lastMove);
-        List<GameState> newNodes  = new ArrayList<>();
-        List<Integer> moves = node.legalMoves(playerNo);
-        for (int move : moves) {
-            newNodes.add(applyMove(move, playerNo, false));
-        }
-        List<MinimaxResult> moveResults = new ArrayList<>();
+        public MinimaxResult minimax(GameState node, int depth, int playerNo, boolean maximisingPlayer) {
+            if (depth == 0 || gameOver(node, playerNo)) return new MinimaxResult(evalNode(node, playerNo), node.lastMove);
+            List<GameState> newNodes  = new ArrayList<>();
+            List<Integer> moves = node.legalMoves(playerNo);
+            for (int move : moves) {
+                newNodes.add(applyMove(move, playerNo, false));
+            }
+            List<MinimaxResult> moveResults = new ArrayList<>();
         for (GameState nextNode : newNodes) {
             moveResults.add(minimax(nextNode, depth - 1, nextPlayer(playerNo), !maximisingPlayer));
         }
@@ -137,11 +160,11 @@ class GameState {
 
     public int evalNode(GameState node, int playerNo) {
         if (playerNo == 1) {
-            if (node.score1 >= 25) return 1000000;
+            if (node.score1 >= 25) return 100;
             else return node.score1 - score1;
         } else {
-            if (node.score2 >= 25) return 1000000;
-            else return node.score2 - score2;
+            if (node.score2 >= 25) return -100;
+            else return -(node.score2 - score2);
         }
     }
 
@@ -162,6 +185,16 @@ class GameState {
     public static int nextPlayer(int playerNo) {
         if (playerNo == 1) return 2;
         else return 1;
+    }
+
+    @Override
+    public String toString() {
+        return "GameState{" +
+                "seeds=" + Arrays.toString(seeds) +
+                ", score1=" + score1 +
+                ", score2=" + score2 +
+                ", lastMove=" + lastMove +
+                '}';
     }
 }
 
