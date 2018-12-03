@@ -1,7 +1,5 @@
 package Basic;
 
-import Awele.moteur.Game;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,11 +10,11 @@ public class SimpleOware {
 
         int currentPlayer = 1;
         boolean maximisingPlayer = true;
-        int nextMove;
+        MinimaxResult nextMove;
         while (!GameState.gameOver(game, currentPlayer)) {
             System.out.println(Arrays.toString(game.legalMoves(currentPlayer).toArray()));
-            nextMove = game.minimax(game, 1, currentPlayer, true);
-            game = game.applyMove(nextMove, currentPlayer, true);
+            nextMove = game.minimax(game, 5, currentPlayer, true);
+            game = game.applyMove(nextMove.position, currentPlayer, true);
             currentPlayer = GameState.nextPlayer(currentPlayer);
             maximisingPlayer = !maximisingPlayer;
         }
@@ -29,17 +27,20 @@ class GameState {
     public int[] seeds;
     public int score1;
     public int score2;
+    public int lastMove;
 
     public GameState() {
         seeds = new int[]{4, 4, 4, 4, 4, 1, 4, 4, 4, 4, 4, 4};
         score1 = 0;
         score2 = 0;
+        lastMove = -1;
     }
 
-    private GameState(int[] seeds, int score1, int score2) {
+    private GameState(int[] seeds, int score1, int score2, int lastMove) {
         this.seeds = seeds;
         this.score1 = score1;
         this.score2 = score2;
+        this.lastMove = lastMove;
     }
 
     public List<Integer> legalMoves(int playerNo) {
@@ -88,45 +89,50 @@ class GameState {
             if (seeds[(firstPos + i) % 12] == 2 || seeds[(firstPos + i) % 12] == 3) {
                 count += seeds[i];
                 seeds[(firstPos + i) % 12] = 0;
-                if (count > 0 && print) System.out.printf("Player %d captures %d seeds from hole %d.", playerNo, count, i);
+                if (count > 0 && print) System.out.printf("Player %d captures %d seeds from hole %d\n", playerNo, count, i);
                 i--;
             } else fail = true;
         }
         GameState res;
-        if (playerNo == 1) res = new GameState(seeds, score1 + count, score2);
-        else res = new GameState(seeds, score1, score2 + count);
+        if (playerNo == 1) res = new GameState(seeds, score1 + count, score2, firstPos);
+        else res = new GameState(seeds, score1, score2 + count, firstPos);
         return res;
     }
 
-    /*public int minimax(GameState node, int depth, int playerNo, boolean maximisingPlayer) {
-        int value;
-        if (depth == 0 || gameOver(node, playerNo)) return evalNode(node, playerNo);
-
-        List<GameState> newNodes = new ArrayList<>();
+    public MinimaxResult minimax(GameState node, int depth, int playerNo, boolean maximisingPlayer) {
+        if (depth == 0 || gameOver(node, playerNo)) return new MinimaxResult(evalNode(node, playerNo), node.lastMove);
+        List<GameState> newNodes  = new ArrayList<>();
         List<Integer> moves = node.legalMoves(playerNo);
         for (int move : moves) {
             newNodes.add(applyMove(move, playerNo, false));
         }
-        if (maximisingPlayer) {
-            value = -100000;
-            for (GameState newNode : newNodes) {
-                value = Math.max(value, minimax(newNode, depth - 1, nextPlayer(playerNo), false));
-            }
-            return value;
-        } else {
-            value = 100000;
-            for (GameState newNode : newNodes) {
-                value = Math.min(value, minimax(newNode, depth - 1, nextPlayer(playerNo), true));
-            }
-            return value;
+        List<MinimaxResult> moveResults = new ArrayList<>();
+        for (GameState nextNode : newNodes) {
+            moveResults.add(minimax(nextNode, depth - 1, nextPlayer(playerNo), !maximisingPlayer));
         }
-    }*/
 
-    public int minimax(GameState node, int depth, int playerNo, boolean meximisingPlayer) {
-        int value;
-        if (depth == 0 || gameOver(node, playerNo)) return evalNode(node, playerNo);
-        List<GameState> newNodes  = new ArrayList<>();
-        List<Integer> moves = node.legalMoves(playerNo)
+        MinimaxResult res = new MinimaxResult(0, moves.get(0));
+        int val;
+        int oldval;
+        if (maximisingPlayer) {
+            val = -10000;
+            oldval = val;
+            for (int i = 0; i < moveResults.size(); i++) {
+                oldval = val;
+                val = Math.max(val, moveResults.get(i).valeur);
+                if (val > oldval) res = moveResults.get(i);
+            }
+        } else {
+            val = 10000;
+            oldval = val;
+            for (int i = 0; i < moveResults.size(); i++) {
+                oldval = val;
+                val = Math.min(val, moveResults.get(i).valeur);
+                if (val < oldval) res = moveResults.get(i);
+            }
+        }
+
+        return res;
     }
 
     public int evalNode(GameState node, int playerNo) {
@@ -156,5 +162,15 @@ class GameState {
     public static int nextPlayer(int playerNo) {
         if (playerNo == 1) return 2;
         else return 1;
+    }
+}
+
+class MinimaxResult {
+    public int valeur;
+    public int position;
+
+    public MinimaxResult(int valeur, int position) {
+        this.valeur = valeur;
+        this.position = position;
     }
 }
