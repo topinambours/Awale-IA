@@ -12,6 +12,7 @@ public class SimpleOware {
     }
 
     public static boolean init(){
+
         System.out.printf("Initialisation de la partie...\n");
         System.out.printf("Quel est le joueur qui commence en premier ? [robot|player]\n");
         Scanner in = new Scanner(System.in);
@@ -41,9 +42,23 @@ public class SimpleOware {
                 nextMove = game.minimax(game, 6, currentPlayer, true);
             } else {
                 System.out.println(game.toString());
-                System.out.printf("Taper le numéro de la cellule à jouer:\n");
-                Scanner in = new Scanner(System.in);
-                nextMove = new MinimaxResult(0, in.nextInt());
+
+                String res = "";
+
+
+                while (!res.matches("[0-9]*[a-zA-Z][0-9]*")){
+                    System.out.printf("Taper le numéro de la cellule à jouer:\n");
+                    Scanner in = new Scanner(System.in);
+                    res = in.nextLine();
+                }
+
+                Request request = new Request(res);
+
+                System.out.println(request.toString());
+
+
+
+                nextMove = new MinimaxResult(0, request.play);
             }
 
             game = game.applyMove(nextMove.position, currentPlayer, true);
@@ -56,7 +71,43 @@ public class SimpleOware {
 
         System.out.printf("Partie terminée! Score joueur 1: %d, score joueur 2: %d\n", game.score1, game.score2);
     }
+
+
+
 }
+
+class Request{
+    public final int play;
+    public final String color;
+    public final int special;
+
+    public Request(int play, String color, int special) {
+        this.play = play;
+        this.color = color;
+        this.special = special;
+    }
+
+    public Request(String str) {
+
+        String[] part = str.split("(?<=\\D)(?=\\d)");
+        this.special = Integer.parseInt(part[1]);//special
+
+        String[] part2 = part[0].split("(?=\\D)(?<=\\d)");
+        this.play = Integer.parseInt(part2[0]);//play
+        this.color =  part2[1];//color
+    }
+
+    @Override
+    public String toString() {
+        return "Request{" +
+                "play=" + play +
+                ", color='" + color + '\'' +
+                ", special=" + special +
+                '}';
+    }
+
+}
+
 
 class GameState {
     public int[] seeds;
