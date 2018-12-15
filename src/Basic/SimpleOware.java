@@ -8,7 +8,24 @@ import java.util.Scanner;
 public class SimpleOware {
     public static void main(String[] args) {
 
-        play(true);
+        play(init());
+    }
+
+    public static boolean init(){
+        System.out.printf("Initialisation de la partie...\n");
+        System.out.printf("Quel est le joueur qui commence en premier ? [robot|player]\n");
+        Scanner in = new Scanner(System.in);
+        String res = in.nextLine();
+
+        System.out.println(res);
+
+        if(res.equalsIgnoreCase("robot")){
+            return true;
+        }else if(res.equalsIgnoreCase("player")){
+            return false;
+        }else{
+            return  init();
+        }
     }
 
     static void play(boolean computerStart) {
@@ -32,6 +49,8 @@ public class SimpleOware {
             game = game.applyMove(nextMove.position, currentPlayer, true);
             currentPlayer = GameState.nextPlayer(currentPlayer);
             robotPlay = !robotPlay;
+
+
 
         }
 
