@@ -5,12 +5,14 @@ import java.util.Scanner;
 
 public class Game {
     private static final int NB_HOLE = 12;
+    private int myRange;
+    private int enemyRange;
     private int[] blackSeeds;
     private int[] redSeeds;
     private int specialSeed;
     private int score1;
     private int score2;
-    private int range;
+
 
     public Game() {
 
@@ -42,10 +44,12 @@ public class Game {
         System.out.println(res);
 
         if(res.equalsIgnoreCase("robot")){
-            range = 6;
+            myRange = 0;
+            enemyRange = 6;
             return true;
         }else if(res.equalsIgnoreCase("player")){
-            range = 0;
+            myRange = 6;
+            enemyRange = 0;
             return false;
         }else{
             return  init();
@@ -60,7 +64,7 @@ public class Game {
 
         String res = "";
         Request request = new Request();
-        while (!(request.play > range) && (request.play < 12 - range)) {
+        while (!(request.play > enemyRange) && (request.play < 12 - enemyRange)) {
 
             res = "";
 
