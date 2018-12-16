@@ -34,9 +34,13 @@ public class AdvancedOware {
         MinimaxResult nextMove;
 
         while(!GameState.gameOver(game)) {
+            if (GameState.playerNoMoves(game)) {
+                game.captureNoMoves();
+                break;
+            }
             if (robotPlay) {
                 System.out.println(Arrays.toString(game.legalMoves(currentPlayer).toArray()));
-                nextMove = game.minimax(game, 6, currentPlayer, true, true);
+                nextMove = game.minimax(game, 3, currentPlayer, true, true);
             } else {
                 System.out.println(game.toString());
 

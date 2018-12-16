@@ -157,12 +157,12 @@ class GameState {
             System.out.printf("Player %d plays from hole %d with %d seeds\n", playerNo, move.position, redSeeds[move.position] + blackSeeds[move.position] + specialSeeds[move.position]);
         }
         GameState res;
-        res = capture(redSeeds, blackSeeds, specialSeeds, lastPos, move.position, playerNo, move.redFirst, print);
+        res = capture(redSeeds, blackSeeds, specialSeeds, lastPos, move.position, playerNo, getLastColor(move), print);
 
         return res;
     }
 
-    public GameState capture(int[] redSeeds, int[] blackSeeds, int[] specialSeeds, int lastPos, int firstPos, int playerNo, boolean redFirst, boolean print) {
+    public GameState capture(int[] redSeeds, int[] blackSeeds, int[] specialSeeds, int lastPos, int firstPos, int playerNo, Color lastColor, boolean print) {
         boolean fail = false;
         int i = lastPos - firstPos;
         if (i < 0) i += 12;
@@ -177,7 +177,7 @@ class GameState {
             }
             int pos = (firstPos + i) % 12;
             int hole;
-            if (redFirst) {
+            if (lastColor == Color.BLACK) {
                 hole = blackSeeds[pos] + specialSeeds[pos];
                 if (hole == 2 || hole == 3) {
                     count += blackSeeds[pos] + specialSeeds[pos];
@@ -186,7 +186,7 @@ class GameState {
                     if (count > 0 && print) System.out.printf("Player %d captures %d black seeds from hole %d\n", playerNo, count, pos);
                     i--;
                 } else fail = true;
-            } else {
+            } else if (lastColor == Color.RED){
                 hole = redSeeds[pos] + specialSeeds[pos];
                 if (hole == 2 || hole == 3) {
                     count += redSeeds[pos] + specialSeeds[pos];
@@ -195,6 +195,22 @@ class GameState {
                     if (count > 0 && print) System.out.printf("Player %d captures %d red seeds from hole %d\n", playerNo, count, pos);
                     i--;
                 } else fail = true;
+            } else {
+                int holeRed = redSeeds[pos] + specialSeeds[pos];
+                int holeBlack = blackSeeds[pos] + specialSeeds[pos];
+                if (holeRed == 2 || holeRed == 3 || holeBlack == 2 || holeBlack == 3) {
+                    count += specialSeeds[pos];
+                    specialSeeds[pos] = 0;
+                }
+                if (holeRed == 2 || holeRed == 3) {
+                    count += redSeeds[pos];
+                    redSeeds[pos] = 0;
+                }
+                if (holeBlack == 2 || holeBlack == 3) {
+                    count += blackSeeds[pos];
+                    blackSeeds[pos] = 0;
+                }
+                if (count > 0 && print) System.out.printf("Player %d captures %d red or black seeds from hole %d\n", playerNo, count, pos);
             }
         }
         GameState res;
@@ -293,9 +309,34 @@ class GameState {
         }
     }
 
+    public void captureNoMoves() {
+        for (int i = 0; i <= 5; i++) {
+            score1 += redSeeds[i] + blackSeeds[i] + specialSeeds[i];
+            redSeeds[i] = 0;
+            blackSeeds[i] = 0;
+            specialSeeds[i] = 0;
+            int j = i + 6;
+            score2 += redSeeds[j] + blackSeeds[j] + specialSeeds[j];
+            redSeeds[j] = 0;
+            blackSeeds[j] = 0;
+            specialSeeds[j] = 0;
+        }
+    }
+
     public static int nextPlayer(int playerNo) {
         if (playerNo == 1) return 2;
         else return 1;
+    }
+
+    public Color getLastColor(Move move) {
+        if (move.posSpecial > redSeeds[move.position] + blackSeeds[move.position]) return Color.SPECIAL;
+        if (move.redFirst) {
+            if (blackSeeds[move.position] > 0) return Color.BLACK;
+            else return Color.RED;
+        } else {
+            if (redSeeds[move.position] > 0) return Color.RED;
+            else return Color.BLACK;
+        }
     }
 
     @Override
