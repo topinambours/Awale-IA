@@ -143,7 +143,7 @@ class GameState {
         lastPos = pos;
 
         if (print) {
-            System.out.printf("Player %d plays from hole %d with %d seeds\n", playerNo, move, redSeeds[move.position] + blackSeeds[move.position] + specialSeeds[move.position]);
+            System.out.printf("Player %d plays from hole %d with %d seeds\n", playerNo, move.position, redSeeds[move.position] + blackSeeds[move.position] + specialSeeds[move.position]);
         }
         GameState res;
         res = capture(redSeeds, blackSeeds, specialSeeds, lastPos, move.position, playerNo, move.redFirst, print);
