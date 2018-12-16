@@ -90,13 +90,14 @@ public class AdvancedOware {
     }
 
     private GameState specialInits(){
-        int[] specialSeeds = new int[]{1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0};
+        int[] specialSeeds = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
         for (int i = 0; i < 3; i++){
             System.out.printf("Quel est la position de la seed numéro %d?\n",i);
             int pos = scanInt();
             specialSeeds[pos] = 1;
         }
+
         return new GameState(specialSeeds);
     }
 
