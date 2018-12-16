@@ -1,45 +1,9 @@
-package Advanced;
+package Advanced.moteur;
 
-import org.ietf.jgss.GSSContext;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
-
-public class AdvancedOware {
-    public static void main(String[] args) {
-
-        play(true);
-    }
-
-    static void play(boolean computerStart) {
-        GameState game = new GameState();
-
-        boolean robotPlay = computerStart;
-        int currentPlayer = 1;
-        MinimaxResult nextMove;
-
-        while(!GameState.gameOver(game, currentPlayer)) {
-            if (robotPlay) {
-                System.out.println(Arrays.toString(game.legalMoves(currentPlayer).toArray()));
-                nextMove = game.minimax(game, 6, currentPlayer, true, true);
-            } else {
-                System.out.println(game.toString());
-                System.out.printf("Taper le numéro de la cellule à jouer:\n");
-                Scanner in = new Scanner(System.in);
-                nextMove = new MinimaxResult(0, in.nextInt());
-            }
-
-            game = game.applyMove(nextMove.position, currentPlayer, true);
-            currentPlayer = GameState.nextPlayer(currentPlayer);
-            robotPlay = !robotPlay;
-
-        }
-
-        System.out.printf("Partie terminée! Score joueur 1: %d, score joueur 2: %d\n", game.score1, game.score2);
-    }
-}
 
 class GameState {
     public int[] redSeeds;
@@ -52,7 +16,7 @@ class GameState {
     public GameState() {
         redSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
         blackSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
-        redSeeds = new int[]{1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0};
+        specialSeeds = new int[]{1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0};
         score1 = 0;
         score2 = 0;
         rootMove = null;
@@ -270,7 +234,7 @@ class GameState {
         this.rootMove = rootMove;
     }
 
-    public boolean gameOver(GameState node) {
+    public static boolean gameOver(GameState node) {
         return (node.score1 > 37 || node.score2 > 37 || node.score1 == 37 && node.score2 == 37);
     }
 
@@ -333,27 +297,5 @@ class GameState {
                 ", score2=" + score2 +
                 ", rootMove=" + rootMove +
                 '}';
-    }
-}
-
-class Move {
-    int position;
-    boolean redFirst;
-    int posSpecial;
-
-    public Move(int position, boolean redFirst, int posSpecial) {
-        this.position = position;
-        this.redFirst = redFirst;
-        this.posSpecial = posSpecial;
-    }
-}
-
-class MinimaxResult {
-    public int valeur;
-    public Move position;
-
-    public MinimaxResult(int valeur, Move position) {
-        this.valeur = valeur;
-        this.position = position;
     }
 }
