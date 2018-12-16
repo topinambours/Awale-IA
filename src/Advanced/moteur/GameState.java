@@ -1,6 +1,8 @@
 package Advanced.moteur;
 
 
+import Awele.moteur.Game;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +19,15 @@ class GameState {
         redSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
         blackSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
         specialSeeds = new int[]{1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0};
+        score1 = 0;
+        score2 = 0;
+        rootMove = null;
+    }
+
+    public GameState(int[] specialSeeds){
+        redSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
+        blackSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
+        this.specialSeeds = specialSeeds;
         score1 = 0;
         score2 = 0;
         rootMove = null;

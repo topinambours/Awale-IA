@@ -18,17 +18,17 @@ public class AdvancedOware {
      * Permet de jouer
      */
     public void play(){
-        play(init());
+        play(init(),specialInits());
     }
 
 
     /**
-     * Permet de jouer
+     * play function
      * @param computerStart
+     * @param game
      */
-    public void play(boolean computerStart) {
-        GameState game = new GameState();
-
+    public void play(boolean computerStart,GameState game) {
+        System.out.println(game);
         boolean robotPlay = computerStart;
         int currentPlayer = 1;
         MinimaxResult nextMove;
@@ -76,6 +76,28 @@ public class AdvancedOware {
 
         }
         return request;
+    }
+
+    private int scanInt(){
+        int res = -1;
+
+        while (res <= 0){
+            Scanner in = new Scanner(System.in);
+            res = in.nextInt();
+        }
+
+        return res;
+    }
+
+    private GameState specialInits(){
+        int[] specialSeeds = new int[]{1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0};
+
+        for (int i = 0; i < 3; i++){
+            System.out.printf("Quel est la position de la seed numéro %d?\n",i);
+            int pos = scanInt();
+            specialSeeds[pos] = 1;
+        }
+        return new GameState(specialSeeds);
     }
 
     /**
