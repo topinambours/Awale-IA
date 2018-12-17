@@ -44,7 +44,7 @@ public class AdvancedOware {
             } else {
                 System.out.println(game.toString());
 
-                Move request = nextRequest();
+                Move request = nextRequest(game);
 
                 nextMove = new MinimaxResult(0, request);
             }
@@ -62,7 +62,7 @@ public class AdvancedOware {
      * Permet d'avoir le moove suivant
      * @return
      */
-    private Move nextRequest(){
+    private Move nextRequest(GameState gameState){
 
         String res = "";
         Move request = new Move();
@@ -77,6 +77,11 @@ public class AdvancedOware {
             }
 
             request = new Move(res);
+
+            if(!(gameState.blackSeeds[request.position] + gameState.specialSeeds[request.position] > 0)){
+                System.out.println("[WARNING] Placement illegale");
+                return nextRequest(gameState);
+            }
 
         }
         return request;
