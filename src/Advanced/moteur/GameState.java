@@ -27,6 +27,7 @@ class GameState {
     public GameState(int[] specialSeeds){
         redSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
         blackSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
+        //blackSeeds = new int[]{3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1};
         this.specialSeeds = specialSeeds;
         score1 = 0;
         score2 = 0;
@@ -154,7 +155,7 @@ class GameState {
         lastPos = pos;
 
         if (print) {
-            System.out.printf("Player %d plays from hole %d with %d seeds\n", playerNo, move.position, redSeeds[move.position] + blackSeeds[move.position] + specialSeeds[move.position]);
+            System.out.printf("Player %d plays from hole %d with %d seeds\n", playerNo, move.position + 1, redSeeds[move.position] + blackSeeds[move.position] + specialSeeds[move.position]);
         }
         GameState res;
         res = capture(newRedSeeds, newBlackSeeds, newSpecialSeeds, lastPos, move.position, playerNo, getLastColor(move), print, rootMove);
@@ -183,7 +184,7 @@ class GameState {
                     count += blackSeeds[pos] + specialSeeds[pos];
                     blackSeeds[pos] = 0;
                     specialSeeds[pos] = 0;
-                    if (count > 0 && print) System.out.printf("Player %d captures %d black seeds from hole %d\n", playerNo, count, pos);
+                    if (count > 0 && print) System.out.printf("Player %d captures %d black seeds from hole %d\n", playerNo, count, pos + 1);
                     i--;
                 } else fail = true;
             } else if (lastColor == Color.RED){
@@ -192,7 +193,7 @@ class GameState {
                     count += redSeeds[pos] + specialSeeds[pos];
                     redSeeds[pos] = 0;
                     specialSeeds[pos] = 0;
-                    if (count > 0 && print) System.out.printf("Player %d captures %d red seeds from hole %d\n", playerNo, count, pos);
+                    if (count > 0 && print) System.out.printf("Player %d captures %d red seeds from hole %d\n", playerNo, count, pos + 1);
                     i--;
                 } else fail = true;
             } else {
@@ -220,7 +221,7 @@ class GameState {
         return res;
     }
 
-    public MinimaxResult minimax(GameState node, int depth, int playerNo, boolean maximisingPlayer, boolean first) {
+    public MinimaxResult minimax(GameState node, int depth, int playerNo, boolean maximisingPlayer, boolean first, int alpha, int beta) {
         if (playerNoMoves(node)) return new MinimaxResult(evalNoMoves(node, playerNo, maximisingPlayer), node.rootMove);
         if (depth == 0 || gameOver(node)) return new MinimaxResult(evalNode(node, playerNo, maximisingPlayer), node.rootMove);
         List<GameState> newNodes = new ArrayList<>();
@@ -231,7 +232,7 @@ class GameState {
             else newNode = applyMove(move, playerNo, false, node.rootMove);
             newNodes.add(newNode);
         }
-        List<MinimaxResult> moveResults = new ArrayList<>();
+        /*List<MinimaxResult> moveResults = new ArrayList<>();
         for (GameState nextNode : newNodes) {
             moveResults.add(minimax(nextNode, depth - 1, nextPlayer(playerNo), !maximisingPlayer, false));
         }
@@ -254,6 +255,30 @@ class GameState {
                     val = newValue.valeur;
                     res = newValue;
                 }
+            }
+        }*/
+        MinimaxResult res = new MinimaxResult(0, moves.get(0));
+        if (maximisingPlayer) {
+            int val = -10000;
+            for (GameState nextNode : newNodes) {
+                MinimaxResult newResult = minimax(nextNode, depth - 1, nextPlayer(playerNo), false, false, alpha, beta);
+                if (newResult.valeur > val) {
+                    val = newResult.valeur;
+                    res = newResult;
+                }
+                alpha = Math.max(alpha, val);
+                if (alpha >= beta) break;
+            }
+        } else {
+            int val = 10000;
+            for (GameState nextNode : newNodes) {
+                MinimaxResult newResult = minimax(nextNode, depth - 1, nextPlayer(playerNo), true, false, alpha, beta);
+                if (newResult.valeur < val) {
+                    val = newResult.valeur;
+                    res = newResult;
+                }
+                beta = Math.min(beta, val);
+                if (alpha >= beta) break;
             }
         }
         return res;
