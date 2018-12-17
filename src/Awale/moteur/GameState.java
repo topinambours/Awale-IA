@@ -1,7 +1,6 @@
-package Advanced.moteur;
+package Awale.moteur;
 
 
-import Awele.moteur.Game;
 
 import java.util.ArrayList;
 import java.util.Arrays;

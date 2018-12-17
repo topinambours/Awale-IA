@@ -1,4 +1,4 @@
-package Advanced.moteur;
+package Awale.moteur;
 
 class Move{
     public final int position;

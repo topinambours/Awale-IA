@@ -1,7 +1,6 @@
-package Advanced;
+package Awale;
 
-import Advanced.moteur.AdvancedOware;
-import Awele.moteur.Game;
+import Awale.moteur.AdvancedOware;
 
 public class Main {
 
