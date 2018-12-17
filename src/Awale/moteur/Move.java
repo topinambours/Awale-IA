@@ -24,15 +24,16 @@ class Move{
     public Move() {
         position = -1;
         redFirst = false;
-        posSpecial = -1;
+        posSpecial = 0;
+    }
+
+    private String letter() {
+        if (redFirst) return "R";
+        else return "B";
     }
 
     @Override
     public String toString() {
-        return "Move{" +
-                "position=" + position +
-                ", redFirst=" + redFirst +
-                ", posSpecial=" + posSpecial +
-                '}';
+        return "" + (position + 1) + letter() + posSpecial;
     }
 }

@@ -53,7 +53,7 @@ class GameState {
                         res.add(new Move(i, true, j));
                     }
                 } else {
-                    res.add(new Move(i, true, -1));
+                    res.add(new Move(i, true, 0));
                 }
             }
             if (blackSeeds[i] > 0) {
@@ -62,7 +62,7 @@ class GameState {
                         res.add(new Move(i, false, j));
                     }
                 } else {
-                    res.add(new Move(i, false, -1));
+                    res.add(new Move(i, false, 0));
                 }
             }
             if (redSeeds[i] == 0 && blackSeeds[i] == 0 && specialSeeds[i] > 0) {
@@ -158,7 +158,7 @@ class GameState {
         lastPos = pos;
 
         if (print) {
-            System.out.printf("Player %d plays from hole %d with %d seeds\n", playerNo, move.position + 1, redSeeds[move.position] + blackSeeds[move.position] + specialSeeds[move.position]);
+            System.out.printf("Player %d plays move %s with %d seeds\n", playerNo, move.toString(), redSeeds[move.position] + blackSeeds[move.position] + specialSeeds[move.position]);
         }
         GameState res;
         res = capture(newRedSeeds, newBlackSeeds, newSpecialSeeds, lastPos, move.position, playerNo, getLastColor(move), print, rootMove);
