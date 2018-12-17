@@ -167,15 +167,15 @@ class GameState {
         int i = lastPos - firstPos;
         if (i < 0) i += 12;
         int count = 0;
-        while (fail != true && (i >= 0)) {
-            if (playerNo == 1 && (firstPos + i) % 12 < 6) {
+        while (!fail && (i >= 0)) {
+            if (playerNo == 1 && Math.floorMod((firstPos + i), 12) < 6) {
                 fail = true;
                 break;
-            } else if (playerNo == 2 && (firstPos + i) % 12 > 5) {
+            } else if (playerNo == 2 && Math.floorMod((firstPos + i), 12) > 5) {
                 fail = true;
                 break;
             }
-            int pos = (firstPos + i) % 12;
+            int pos = Math.floorMod((firstPos + i), 12);
             int hole;
             if (lastColor == Color.BLACK) {
                 hole = blackSeeds[pos] + specialSeeds[pos];
@@ -211,6 +211,7 @@ class GameState {
                     blackSeeds[pos] = 0;
                 }
                 if (count > 0 && print) System.out.printf("Player %d captures %d red or black seeds from hole %d\n", playerNo, count, pos);
+                i--;
             }
         }
         GameState res;
