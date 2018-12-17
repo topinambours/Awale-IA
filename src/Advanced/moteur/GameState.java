@@ -102,8 +102,9 @@ class GameState {
                     }
                     newRedSeeds[pos]++;
                     numRedSeeds--;
-                    tracker++;
+
                 }
+                tracker++;
             }
             while (numBlackSeeds > 0) {
                 pos = (move.position + tracker) % 12;
@@ -116,8 +117,9 @@ class GameState {
                     }
                     newBlackSeeds[pos]++;
                     numBlackSeeds--;
-                    tracker++;
+
                 }
+                tracker++;
             }
         } else {
             while (numBlackSeeds > 0) {
@@ -131,8 +133,9 @@ class GameState {
                     }
                     newBlackSeeds[pos]++;
                     numBlackSeeds--;
-                    tracker++;
+
                 }
+                tracker++;
             }
             while (numRedSeeds > 0) {
                 pos = (move.position + tracker) % 12;
@@ -145,8 +148,9 @@ class GameState {
                     }
                     newRedSeeds[pos]++;
                     numRedSeeds--;
-                    tracker++;
+
                 }
+                tracker++;
             }
         }
         newRedSeeds[move.position] = 0;
