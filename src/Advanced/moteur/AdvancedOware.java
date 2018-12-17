@@ -71,7 +71,7 @@ public class AdvancedOware {
             res = "";
 
             while (!res.matches("[0-9]*[a-zA-Z][0-9]*")) {
-                System.out.printf("Taper le coups à jouer:\n");
+                System.out.printf("Taper le coup à jouer:\n");
                 Scanner in = new Scanner(System.in);
                 res = in.nextLine();
             }
@@ -96,10 +96,10 @@ public class AdvancedOware {
     private GameState specialInits(){
         int[] specialSeeds = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-        for (int i = 0; i < 3; i++){
+        for (int i = 0; i < 2; i++){
             System.out.printf("Quel est la position de la seed numéro %d?\n",i);
             int pos = scanInt();
-            specialSeeds[pos] = 1;
+            specialSeeds[pos - 1] = 1;
         }
 
         return new GameState(specialSeeds);

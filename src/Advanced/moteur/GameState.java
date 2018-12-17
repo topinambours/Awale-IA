@@ -93,8 +93,8 @@ class GameState {
             while (numRedSeeds > 0) {
                 pos = (move.position + tracker) % 12;
                 if (pos != move.position) {
-                    if (pos >= move.posSpecial + move.position - 1 && remainingSpecialSeeds > 0) {
-                        specialSeeds[pos]++;
+                    if (tracker >= move.posSpecial && remainingSpecialSeeds > 0) {
+                        newSpecialSeeds[pos]++;
                         remainingSpecialSeeds--;
                         tracker++;
                         continue;
@@ -107,8 +107,8 @@ class GameState {
             while (numBlackSeeds > 0) {
                 pos = (move.position + tracker) % 12;
                 if (pos != move.position) {
-                    if (pos >= move.posSpecial + move.position - 1 && remainingSpecialSeeds > 0) {
-                        specialSeeds[pos]++;
+                    if (tracker >= move.posSpecial && remainingSpecialSeeds > 0) {
+                        newSpecialSeeds[pos]++;
                         remainingSpecialSeeds--;
                         tracker++;
                         continue;
@@ -122,8 +122,8 @@ class GameState {
             while (numBlackSeeds > 0) {
                 pos = (move.position + tracker) % 12;
                 if (pos != move.position) {
-                    if (pos >= move.posSpecial + move.position - 1 && remainingSpecialSeeds > 0) {
-                        specialSeeds[pos]++;
+                    if (tracker >= move.posSpecial && remainingSpecialSeeds > 0) {
+                        newSpecialSeeds[pos]++;
                         remainingSpecialSeeds--;
                         tracker++;
                         continue;
@@ -136,8 +136,8 @@ class GameState {
             while (numRedSeeds > 0) {
                 pos = (move.position + tracker) % 12;
                 if (pos != move.position) {
-                    if (pos >= move.posSpecial + move.position - 1 && remainingSpecialSeeds > 0) {
-                        specialSeeds[pos]++;
+                    if (tracker >= move.posSpecial && remainingSpecialSeeds > 0) {
+                        newSpecialSeeds[pos]++;
                         remainingSpecialSeeds--;
                         tracker++;
                         continue;
@@ -157,7 +157,7 @@ class GameState {
             System.out.printf("Player %d plays from hole %d with %d seeds\n", playerNo, move.position, redSeeds[move.position] + blackSeeds[move.position] + specialSeeds[move.position]);
         }
         GameState res;
-        res = capture(redSeeds, blackSeeds, specialSeeds, lastPos, move.position, playerNo, getLastColor(move), print);
+        res = capture(newRedSeeds, newBlackSeeds, newSpecialSeeds, lastPos, move.position, playerNo, getLastColor(move), print);
 
         return res;
     }
@@ -227,7 +227,7 @@ class GameState {
         for (Move move : moves) {
             GameState newNode = applyMove(move, playerNo, false);
             if (first) newNode.setRootMove(move);
-            newNodes.add(applyMove(move, playerNo, false));
+            newNodes.add(newNode);
         }
         List<MinimaxResult> moveResults = new ArrayList<>();
         for (GameState nextNode : newNodes) {

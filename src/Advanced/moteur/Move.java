@@ -17,8 +17,8 @@ class Move{
         this.posSpecial = Integer.parseInt(part[1]);//special
 
         String[] part2 = part[0].split("(?=\\D)(?<=\\d)");
-        this.position = Integer.parseInt(part2[0]);//play
-        this.redFirst =  part2[1] == "R";//color
+        this.position = Integer.parseInt(part2[0]) - 1;//play
+        this.redFirst =  part2[1].equals("R");//color
     }
 
     public Move() {
