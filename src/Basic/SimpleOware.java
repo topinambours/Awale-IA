@@ -5,17 +5,49 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+
 public class SimpleOware {
+    private static int range;
+
+
     public static void main(String[] args) {
 
-        play(true);
+        play(init());
+    }
+
+    public static boolean init(){
+
+        System.out.printf("Initialisation de la partie...\n");
+        System.out.printf("Quel est le joueur qui commence en premier ? [robot|player]\n");
+        Scanner in = new Scanner(System.in);
+        String res = in.nextLine();
+
+        System.out.println(res);
+
+        if(res.equalsIgnoreCase("robot")){
+            range = 6;
+            return true;
+        }else if(res.equalsIgnoreCase("player")){
+            range = 0;
+            return false;
+        }else{
+            return  init();
+        }
     }
 
     static void play(boolean computerStart) {
         GameState game = new GameState();
 
         boolean robotPlay = computerStart;
-        int currentPlayer = 1;
+
+        //Set the good playerNb
+        int currentPlayer;
+        if(computerStart){
+            currentPlayer = 1;
+        }else{
+            currentPlayer = 2;
+        }
+
         MinimaxResult nextMove;
 
         while(!GameState.gameOver(game, currentPlayer)) {
@@ -24,20 +56,84 @@ public class SimpleOware {
                 nextMove = game.minimax(game, 6, currentPlayer, true);
             } else {
                 System.out.println(game.toString());
-                System.out.printf("Taper le numéro de la cellule à jouer:\n");
-                Scanner in = new Scanner(System.in);
-                nextMove = new MinimaxResult(0, in.nextInt());
+
+                String res = "";
+                Request request = new Request();
+
+                //Verification des inputs
+            while (!(request.play > range) && (request.play < 12 - range)) {
+
+                res = "";
+
+                while (!res.matches("[0-9]*[a-zA-Z][0-9]*")) {
+                    System.out.printf("Taper le coups à jouer:\n");
+                    Scanner in = new Scanner(System.in);
+                    res = in.nextLine();
+                }
+
+                request = new Request(res);
+
+            }
+                System.out.println(request.toString());
+
+
+
+                nextMove = new MinimaxResult(0, request.play);
             }
 
             game = game.applyMove(nextMove.position, currentPlayer, true);
             currentPlayer = GameState.nextPlayer(currentPlayer);
             robotPlay = !robotPlay;
 
+
+
         }
 
         System.out.printf("Partie terminée! Score joueur 1: %d, score joueur 2: %d\n", game.score1, game.score2);
     }
+
+
+
 }
+
+class Request{
+    public final int play;
+    public final String color;
+    public final int special;
+
+    public Request(int play, String color, int special) {
+        this.play = play;
+        this.color = color;
+        this.special = special;
+    }
+
+    public Request(String str) {
+
+        String[] part = str.split("(?<=\\D)(?=\\d)");
+        this.special = Integer.parseInt(part[1]);//special
+
+        String[] part2 = part[0].split("(?=\\D)(?<=\\d)");
+        this.play = Integer.parseInt(part2[0]);//play
+        this.color =  part2[1];//color
+    }
+
+    public Request() {
+        play = -1;
+        color = "NaN";
+        special = -1;
+    }
+
+    @Override
+    public String toString() {
+        return "Request{" +
+                "play=" + play +
+                ", color='" + color + '\'' +
+                ", special=" + special +
+                '}';
+    }
+
+}
+
 
 class GameState {
     public int[] seeds;
