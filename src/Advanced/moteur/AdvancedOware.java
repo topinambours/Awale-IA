@@ -78,8 +78,8 @@ public class AdvancedOware {
 
             request = new Move(res);
 
-            if(!(gameState.blackSeeds[request.position] + gameState.specialSeeds[request.position] > 0)){
-                System.out.println("[WARNING] Placement illegale");
+            if(!(gameState.blackSeeds[request.position] + gameState.redSeeds[request.position] + gameState.specialSeeds[request.position] > 0)){
+                System.out.println("[WARNING] Placement illegal");
                 return nextRequest(gameState);
             }
 
