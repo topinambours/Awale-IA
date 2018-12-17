@@ -49,7 +49,7 @@ public class AdvancedOware {
                 nextMove = new MinimaxResult(0, request);
             }
 
-            game = game.applyMove(nextMove.position, currentPlayer, true);
+            game = game.applyMove(nextMove.position, currentPlayer, true, null);
             currentPlayer = GameState.nextPlayer(currentPlayer);
             robotPlay = !robotPlay;
 

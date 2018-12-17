@@ -74,7 +74,7 @@ class GameState {
         return res;
     }
 
-    public GameState applyMove(Move move, int playerNo, boolean print) {
+    public GameState applyMove(Move move, int playerNo, boolean print, Move rootMove) {
         int lastPos;
         int tracker = 1;
 
@@ -157,12 +157,12 @@ class GameState {
             System.out.printf("Player %d plays from hole %d with %d seeds\n", playerNo, move.position, redSeeds[move.position] + blackSeeds[move.position] + specialSeeds[move.position]);
         }
         GameState res;
-        res = capture(newRedSeeds, newBlackSeeds, newSpecialSeeds, lastPos, move.position, playerNo, getLastColor(move), print);
+        res = capture(newRedSeeds, newBlackSeeds, newSpecialSeeds, lastPos, move.position, playerNo, getLastColor(move), print, rootMove);
 
         return res;
     }
 
-    public GameState capture(int[] redSeeds, int[] blackSeeds, int[] specialSeeds, int lastPos, int firstPos, int playerNo, Color lastColor, boolean print) {
+    public GameState capture(int[] redSeeds, int[] blackSeeds, int[] specialSeeds, int lastPos, int firstPos, int playerNo, Color lastColor, boolean print, Move rootMove) {
         boolean fail = false;
         int i = lastPos - firstPos;
         if (i < 0) i += 12;
@@ -215,8 +215,8 @@ class GameState {
             }
         }
         GameState res;
-        if (playerNo == 1) res = new GameState(redSeeds, blackSeeds, specialSeeds, score1 + count, score2, this.rootMove);
-        else res = new GameState(redSeeds, blackSeeds, specialSeeds, score1, score2 + count, this.rootMove);
+        if (playerNo == 1) res = new GameState(redSeeds, blackSeeds, specialSeeds, score1 + count, score2, rootMove);
+        else res = new GameState(redSeeds, blackSeeds, specialSeeds, score1, score2 + count, rootMove);
         return res;
     }
 
@@ -226,8 +226,9 @@ class GameState {
         List<GameState> newNodes = new ArrayList<>();
         List<Move> moves = node.legalMoves(playerNo);
         for (Move move : moves) {
-            GameState newNode = applyMove(move, playerNo, false);
-            if (first) newNode.setRootMove(move);
+            GameState newNode; //= applyMove(move, playerNo, false);
+            if (first) newNode = applyMove(move, playerNo, false, move);
+            else newNode = applyMove(move, playerNo, false, node.rootMove);
             newNodes.add(newNode);
         }
         List<MinimaxResult> moveResults = new ArrayList<>();
