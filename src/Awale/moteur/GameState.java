@@ -25,12 +25,13 @@ class GameState {
 
 
     public GameState(int[] specialSeeds){
-        /*
+
         redSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
         blackSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
-        */
+        /*
         redSeeds = new int[]{0,0,0,0,12,13,0,3,0,0,1,0};
         blackSeeds = new int[]{0,0,0,0,9,9,0,1,0,1,0,0};
+        */
         //blackSeeds = new int[]{3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1};
         this.specialSeeds = specialSeeds;
         score1 = 0;
@@ -80,7 +81,6 @@ class GameState {
     }
 
     public GameState applyMove(Move move, int playerNo, boolean print, Move rootMove) {
-        System.out.println("apply on");
         int lastPos;
         int tracker = 1;
 
@@ -168,7 +168,6 @@ class GameState {
                 }
             }
             tracker++;
-            System.out.println("bug");
         }
         newRedSeeds[move.position] = 0;
         newBlackSeeds[move.position] = 0;
@@ -179,15 +178,12 @@ class GameState {
             System.out.printf("Player %d plays move %s with %d seeds\n", playerNo, move.toString(), redSeeds[move.position] + blackSeeds[move.position] + specialSeeds[move.position]);
         }
         GameState res;
-        System.out.println("hey");
         res = capture(newRedSeeds, newBlackSeeds, newSpecialSeeds, lastPos, move.position, playerNo, getLastColor(move), print, rootMove);
 
-        System.out.println("apply off");
         return res;
     }
 
     public GameState capture(int[] redSeeds, int[] blackSeeds, int[] specialSeeds, int lastPos, int firstPos, int playerNo, Color lastColor, boolean print, Move rootMove) {
-        System.out.println("" + firstPos + lastColor);
 
         boolean fail = false;
         int i = lastPos - firstPos;
@@ -248,7 +244,6 @@ class GameState {
                 if (newcap > 0 && print) System.out.printf("Player %d captures %d red or black seeds from hole %d\n", playerNo, newcap, pos);
                 count += newcap;
                 i--;
-                System.out.println("" + firstPos + lastColor + redCap + blackCap);
                 if (redCap && blackCap) {
                     lastColor = Color.SPECIAL;
                 } else if (redCap) {
@@ -309,7 +304,6 @@ class GameState {
             for (GameState nextNode : newNodes) {
                 MinimaxResult newResult = minimax(nextNode, depth - 1, nextPlayer(playerNo), false, false, alpha, beta);
                 if (first) {
-                    System.out.println(newResult.valeur);
                     values.add(newResult.valeur);
                 }
                 if (newResult.valeur > val) {
