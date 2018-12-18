@@ -267,10 +267,12 @@ class GameState {
             }
         }*/
         MinimaxResult res = new MinimaxResult(0, moves.get(0));
+        ArrayList<Integer> values = new ArrayList<>();
         if (maximisingPlayer) {
             int val = -10000;
             for (GameState nextNode : newNodes) {
                 MinimaxResult newResult = minimax(nextNode, depth - 1, nextPlayer(playerNo), false, false, alpha, beta);
+                if (first) values.add(newResult.valeur);
                 if (newResult.valeur > val) {
                     val = newResult.valeur;
                     res = newResult;
@@ -282,6 +284,7 @@ class GameState {
             int val = 10000;
             for (GameState nextNode : newNodes) {
                 MinimaxResult newResult = minimax(nextNode, depth - 1, nextPlayer(playerNo), true, false, alpha, beta);
+                if (first) values.add(newResult.valeur);
                 if (newResult.valeur < val) {
                     val = newResult.valeur;
                     res = newResult;
@@ -290,6 +293,7 @@ class GameState {
                 if (alpha >= val) break;
             }
         }
+        if (first) System.out.println(Arrays.toString(values.toArray()));
         return res;
     }
 
