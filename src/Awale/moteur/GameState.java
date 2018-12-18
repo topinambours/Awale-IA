@@ -276,7 +276,7 @@ class GameState {
                     res = newResult;
                 }
                 alpha = Math.max(alpha, val);
-                if (alpha >= beta) break;
+                if (val >= beta) break;
             }
         } else {
             int val = 10000;
@@ -287,7 +287,7 @@ class GameState {
                     res = newResult;
                 }
                 beta = Math.min(beta, val);
-                if (alpha >= beta) break;
+                if (alpha >= val) break;
             }
         }
         return res;
