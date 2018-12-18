@@ -152,6 +152,16 @@ class GameState {
                 tracker++;
             }
         }
+        while (remainingSpecialSeeds > 0) {
+            pos = (move.position + tracker) % 12;
+            if (pos != move.position) {
+                if (tracker >= move.posSpecial) {
+                    newSpecialSeeds[pos]++;
+                    remainingSpecialSeeds--;
+                    tracker++;
+                }
+            } else tracker++;
+        }
         newRedSeeds[move.position] = 0;
         newBlackSeeds[move.position] = 0;
         newSpecialSeeds[move.position] = 0;
@@ -207,6 +217,8 @@ class GameState {
                 int holeRed = redSeeds[pos] + specialSeeds[pos];
                 int holeBlack = blackSeeds[pos] + specialSeeds[pos];
                 int newcap = 0;
+                boolean redCap = false;
+                boolean blackCap = false;
                 if (holeRed == 2 || holeRed == 3 || holeBlack == 2 || holeBlack == 3) {
                     newcap += specialSeeds[pos];
                     specialSeeds[pos] = 0;
@@ -214,14 +226,25 @@ class GameState {
                 if (holeRed == 2 || holeRed == 3) {
                     newcap += redSeeds[pos];
                     redSeeds[pos] = 0;
+                    redCap = true;
                 }
                 if (holeBlack == 2 || holeBlack == 3) {
                     newcap += blackSeeds[pos];
                     blackSeeds[pos] = 0;
+                    blackCap = true;
                 }
                 if (newcap > 0 && print) System.out.printf("Player %d captures %d red or black seeds from hole %d\n", playerNo, newcap, pos);
                 count += newcap;
                 i--;
+                if (redCap && blackCap) {
+                    lastColor = Color.SPECIAL;
+                } else if (redCap) {
+                    lastColor = Color.RED;
+                } else if (blackCap) {
+                    lastColor = Color.BLACK;
+                } else {
+                    fail = true;
+                }
             }
         }
         GameState res;
