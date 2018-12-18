@@ -267,29 +267,33 @@ class GameState {
             }
         }*/
         MinimaxResult res = new MinimaxResult(0, moves.get(0));
+        ArrayList<Integer> values = new ArrayList<>();
         if (maximisingPlayer) {
             int val = -10000;
             for (GameState nextNode : newNodes) {
                 MinimaxResult newResult = minimax(nextNode, depth - 1, nextPlayer(playerNo), false, false, alpha, beta);
+                if (first) values.add(newResult.valeur);
                 if (newResult.valeur > val) {
                     val = newResult.valeur;
                     res = newResult;
                 }
                 alpha = Math.max(alpha, val);
-                if (alpha >= beta) break;
+                if (val >= beta) break;
             }
         } else {
             int val = 10000;
             for (GameState nextNode : newNodes) {
                 MinimaxResult newResult = minimax(nextNode, depth - 1, nextPlayer(playerNo), true, false, alpha, beta);
+                if (first) values.add(newResult.valeur);
                 if (newResult.valeur < val) {
                     val = newResult.valeur;
                     res = newResult;
                 }
                 beta = Math.min(beta, val);
-                if (alpha >= beta) break;
+                if (alpha >= val) break;
             }
         }
+        if (first) System.out.println(Arrays.toString(values.toArray()));
         return res;
     }
 
