@@ -40,7 +40,7 @@ public class AdvancedOware {
             }
             if (robotPlay) {
                 System.out.println(Arrays.toString(game.legalMoves(currentPlayer).toArray()));
-                nextMove = game.minimax(game, 7, currentPlayer, true, true, -10000, 10000);
+                nextMove = game.minimax(game, 3, currentPlayer, true, true, -10000, 10000);
                 System.out.printf("expected value : %d\n", nextMove.valeur);
             } else {
                 System.out.println(game.toString());
@@ -105,7 +105,7 @@ public class AdvancedOware {
         for (int i = 0; i < 2; i++){
             System.out.printf("Quel est la position de la seed numéro %d?\n",i);
             int pos = scanInt();
-            specialSeeds[pos - 1] = 1;
+            specialSeeds[pos - 1] += 1;
         }
 
         return new GameState(specialSeeds);
