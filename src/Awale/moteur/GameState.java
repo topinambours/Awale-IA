@@ -184,37 +184,43 @@ class GameState {
             if (lastColor == Color.BLACK) {
                 hole = blackSeeds[pos] + specialSeeds[pos];
                 if (hole == 2 || hole == 3) {
-                    count += blackSeeds[pos] + specialSeeds[pos];
+                    int newcap = 0;
+                    newcap += blackSeeds[pos] + specialSeeds[pos];
                     blackSeeds[pos] = 0;
                     specialSeeds[pos] = 0;
-                    if (count > 0 && print) System.out.printf("Player %d captures %d black seeds from hole %d\n", playerNo, count, pos + 1);
+                    if (newcap > 0 && print) System.out.printf("Player %d captures %d black seeds from hole %d\n", playerNo, newcap, pos + 1);
+                    count += newcap;
                     i--;
                 } else fail = true;
             } else if (lastColor == Color.RED){
                 hole = redSeeds[pos] + specialSeeds[pos];
                 if (hole == 2 || hole == 3) {
-                    count += redSeeds[pos] + specialSeeds[pos];
+                    int newcap = 0;
+                    newcap += redSeeds[pos] + specialSeeds[pos];
                     redSeeds[pos] = 0;
                     specialSeeds[pos] = 0;
-                    if (count > 0 && print) System.out.printf("Player %d captures %d red seeds from hole %d\n", playerNo, count, pos + 1);
+                    if (newcap > 0 && print) System.out.printf("Player %d captures %d red seeds from hole %d\n", playerNo, newcap, pos + 1);
+                    count += newcap;
                     i--;
                 } else fail = true;
             } else {
                 int holeRed = redSeeds[pos] + specialSeeds[pos];
                 int holeBlack = blackSeeds[pos] + specialSeeds[pos];
+                int newcap = 0;
                 if (holeRed == 2 || holeRed == 3 || holeBlack == 2 || holeBlack == 3) {
-                    count += specialSeeds[pos];
+                    newcap += specialSeeds[pos];
                     specialSeeds[pos] = 0;
                 }
                 if (holeRed == 2 || holeRed == 3) {
-                    count += redSeeds[pos];
+                    newcap += redSeeds[pos];
                     redSeeds[pos] = 0;
                 }
                 if (holeBlack == 2 || holeBlack == 3) {
-                    count += blackSeeds[pos];
+                    newcap += blackSeeds[pos];
                     blackSeeds[pos] = 0;
                 }
-                if (count > 0 && print) System.out.printf("Player %d captures %d red or black seeds from hole %d\n", playerNo, count, pos);
+                if (newcap > 0 && print) System.out.printf("Player %d captures %d red or black seeds from hole %d\n", playerNo, newcap, pos);
+                count += newcap;
                 i--;
             }
         }
