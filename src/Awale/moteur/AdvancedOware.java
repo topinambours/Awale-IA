@@ -40,7 +40,8 @@ public class AdvancedOware {
             }
             if (robotPlay) {
                 System.out.println(Arrays.toString(game.legalMoves(currentPlayer).toArray()));
-                nextMove = game.minimax(game, 6, currentPlayer, true, true, -10000, 10000);
+                nextMove = game.minimax(game, 8, currentPlayer, true, true, -10000, 10000);
+                System.out.printf("expected value : %d\n", nextMove.valeur);
             } else {
                 System.out.println(game.toString());
 
