@@ -49,7 +49,7 @@ class GameState {
         for (int i = offset; i < offset + 6; i++) {
             if (redSeeds[i] > 0) {
                 if (specialSeeds[i] > 0) {
-                    for (int j = 1; j <= redSeeds[i] + blackSeeds[i]; j++) {
+                    for (int j = redSeeds[i] + blackSeeds[i]; j >= 1; j--) {
                         res.add(new Move(i, true, j));
                     }
                 } else {
@@ -58,7 +58,7 @@ class GameState {
             }
             if (blackSeeds[i] > 0) {
                 if (specialSeeds[i] > 0) {
-                    for (int j = 1; j <= redSeeds[i] + blackSeeds[i]; j++) {
+                    for (int j = redSeeds[i] + blackSeeds[i]; j >= 1; j--) {
                         res.add(new Move(i, false, j));
                     }
                 } else {
