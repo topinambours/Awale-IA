@@ -66,7 +66,7 @@ public class AdvancedOware {
 
         String res = "";
         Move request = new Move();
-        while (!(request.position > enemyRange) && (request.position < 12 - enemyRange)) {
+        //while (!(request.position > enemyRange) && (request.position < 12 - enemyRange)) {
 
             res = "";
 
@@ -83,7 +83,7 @@ public class AdvancedOware {
                 return nextRequest(gameState);
             }
 
-        }
+        //}
         return request;
     }
 
