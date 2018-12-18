@@ -105,7 +105,7 @@ public class AdvancedOware {
         for (int i = 0; i < 2; i++){
             System.out.printf("Quel est la position de la seed numéro %d?\n",i);
             int pos = scanInt();
-            specialSeeds[pos - 1] = 1;
+            specialSeeds[pos - 1] += 1;
         }
 
         return new GameState(specialSeeds);
