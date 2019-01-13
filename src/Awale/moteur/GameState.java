@@ -250,7 +250,8 @@ public class GameState {
     int minimax(GameState node, Move bestMove, int depth, int playerNo, boolean maximisingPlayer, int alpha, int beta) {
         // CHECK IF TERMINAL OR LEAF NODE AND EVALUATE IF SO
         if (playerNoMoves(node)) return evalNoMoves(node, playerNo, maximisingPlayer);
-        if (depth == 0 || gameOver(node)) return evalNode(node, playerNo, maximisingPlayer);
+        //if (depth == 0 || gameOver(node)) return evalNode(node, playerNo, maximisingPlayer);
+        if (depth == 0 || gameOver(node)) return advancedEval(node, playerNo, maximisingPlayer);
 
         // APPLY POSSIBLE MOVES TO CURRENT NODES TO GENERATE LIST OF CHILD NODES
         List<Move> moves = node.legalMoves(playerNo);
@@ -282,14 +283,81 @@ public class GameState {
 
     int evalNode(GameState node, int playerNo, boolean maximisingPlayer) {
         if (playerNo == 1 && maximisingPlayer || playerNo == 2 && !maximisingPlayer) {
-            if (node.score1 >= 38) return 100;
-            else if (node.score2 >= 38) return -100;
+            if (node.score1 >= 38) return 10000000;
+            else if (node.score2 >= 38) return -10000000;
             else return node.score1 - node.score2;
         } else {
-            if (node.score2 >= 38) return 100;
-            else if (node.score1 >= 38) return -100;
+            if (node.score2 >= 38) return 10000000;
+            else if (node.score1 >= 38) return -10000000;
             else return node.score2 - node.score1;
         }
+    }
+
+    int advancedEval(GameState node, int playerNo, boolean maximisingPlayer) {
+        boolean p1max = playerNo == 1 && maximisingPlayer || playerNo == 2 && !maximisingPlayer;
+
+        int staticScore;
+        int staticWeight = 100;
+        if (p1max) {
+            if (node.score1 >= 38) staticScore = 10000000;
+            else if (node.score2 >= 38) staticScore = -10000000;
+            else staticScore =  staticWeight * node.score1;
+        } else {
+            if (node.score2 >= 38) staticScore = 10000000;
+            else if (node.score1 >= 38) staticScore = -10000000;
+            else staticScore =  staticWeight * node.score2;
+        }
+
+        int maxPitWeight = 20;
+        int maxPit = maxPitWeight * countMaxPit(node, playerNo);
+
+        int seedWeight = 19;
+        int seedsOnSide = seedWeight * countSeedsOnSide(node, playerNo);
+
+        int pitsWeight = 37;
+        int playablePits = pitsWeight * countPlayablePits(node, playerNo);
+
+        int opponentScoreWeight = 57;
+        int opponentScore = opponentScoreWeight * opponentCounterMove(node, playerNo);
+
+        return staticScore + maxPit + seedsOnSide + playablePits + opponentScore;
+    }
+
+    int countMaxPit(GameState node, int playerNo) {
+        int count = 0;
+        for (int i = 6 * (playerNo - 1); i < 6 * playerNo; i++) {
+            count = Math.max(count, node.blackSeeds[i] + node.redSeeds[i] + node.specialSeeds[i]);
+        }
+        return count;
+    }
+
+    int countSeedsOnSide(GameState node, int playerNo) {
+        int acc = 0;
+        for (int i = 6 * (playerNo - 1); i < 6 * playerNo; i++) {
+            acc += node.blackSeeds[i] + node.redSeeds[i] + node.specialSeeds[i];
+        }
+        return acc;
+    }
+
+    int countPlayablePits(GameState node, int playerNo) {
+        int count = 0;
+        for (int i = 6 * (playerNo - 1); i < 6 * playerNo; i++) {
+            if (node.blackSeeds[i] + node.redSeeds[i] + node.specialSeeds[i] > 0) count++;
+        }
+        return count;
+    }
+
+    int opponentCounterMove(GameState node, int playerNo) {
+        List<Move> moves = node.legalMoves(nextPlayer(playerNo));
+        int oppScore = 0;
+        for (Move move : moves) {
+            if (playerNo == 1) {
+                oppScore = -Math.max(oppScore, node.applyMove(move, 2, false).score2);
+            } else {
+                oppScore = -Math.max(oppScore, node.applyMove(move, 1, false).score1);
+            }
+        }
+        return oppScore;
     }
 
     static boolean playerNoMoves(GameState node) {
@@ -314,12 +382,12 @@ public class GameState {
         }
 
         if (playerNo == 1 && maximisingPlayer || playerNo == 2 && !maximisingPlayer) {
-            if (score1 >= 38) return 100;
-            else if (score2 >= 38) return -100;
+            if (score1 >= 38) return 9999999;
+            else if (score2 >= 38) return -9999999;
             else return score1 - score2;
         } else {
-            if (score2 >= 38) return 100;
-            else if (score1 >= 38) return -100;
+            if (score2 >= 38) return 9999999;
+            else if (score1 >= 38) return -9999999;
             else return score2 - score1;
         }
     }
