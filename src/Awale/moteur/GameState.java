@@ -10,8 +10,6 @@ public class GameState {
     int[] specialSeeds;
     int score1;
     int score2;
-    private final int DEPTH = 8;
-    private final int SPECIAL_DEPTH = 6;
 
     public GameState() {
         redSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
@@ -281,14 +279,6 @@ public class GameState {
         return (node.score1 > 37 || node.score2 > 37 || node.score1 == 37 && node.score2 == 37);
     }
 
-
-    private int getDeph(GameState node,Move currentMove){
-        if(node.specialSeeds[currentMove.position] == 0){
-            return DEPTH;
-        }else{
-            return SPECIAL_DEPTH;
-        }
-    }
 
     int evalNode(GameState node, int playerNo, boolean maximisingPlayer) {
         if (playerNo == 1 && maximisingPlayer || playerNo == 2 && !maximisingPlayer) {

@@ -1,13 +1,19 @@
 package Awale.moteur;
 
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Scanner;
+import java.util.function.IntSupplier;
 
 
 public class AdvancedOware {
     int enemyRange;
     int myRange;
+
+    private final int DEPTH = 8;
+    private final int SPECIAL_DEPTH = 6;
 
     public AdvancedOware() {
     }
@@ -18,6 +24,20 @@ public class AdvancedOware {
      */
     public void play() {
         play(init(), specialInits());
+    }
+
+
+    private int getDeph(GameState node){
+        int nb_special = 0;
+        for(int i = 0; i < node.specialSeeds.length ;i++) {
+            if (node.specialSeeds[i] > 0) nb_special++;
+        }
+
+        if(nb_special == 0){
+            return DEPTH;
+        }else{
+            return SPECIAL_DEPTH;
+        }
     }
 
 
@@ -41,7 +61,7 @@ public class AdvancedOware {
             }
             if (robotPlay) {
                 System.out.println(Arrays.toString(game.legalMoves(currentPlayer).toArray()));
-                expected = game.minimax(game, bestMove, 8, currentPlayer, true, -10000, 10000);
+                expected = game.minimax(game, bestMove, getDeph(game), currentPlayer, true, -10000, 10000);
                 System.out.printf("expected value : %d\n", expected);
             } else {
                 System.out.println(game.toString());
