@@ -1,6 +1,6 @@
 package Awale.moteur;
 
-class Move{
+public class Move{
     public final int position;
     public final boolean redFirst;
     public final int posSpecial;

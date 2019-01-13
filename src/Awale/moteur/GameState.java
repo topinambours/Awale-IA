@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-class GameState {
+public class GameState {
     public int[] redSeeds;
     public int[] blackSeeds;
     public int[] specialSeeds;
@@ -28,10 +28,10 @@ class GameState {
 
         redSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
         blackSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
-        /*
-        redSeeds = new int[]{0,0,0,0,12,13,0,3,0,0,1,0};
-        blackSeeds = new int[]{0,0,0,0,9,9,0,1,0,1,0,0};
-        */
+
+        //redSeeds = new int[]{1,8,5,0,0,4,0,0,2,2,7,7};
+        //blackSeeds = new int[]{0,9,6,0,1,6,0,2,1,1,5,5};
+
         //blackSeeds = new int[]{3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1};
         this.specialSeeds = specialSeeds;
         score1 = 0;
@@ -81,8 +81,8 @@ class GameState {
     }
 
     public GameState applyMove(Move move, int playerNo, boolean print, Move rootMove) {
-        int lastPos;
         int tracker = 1;
+        int skipped = 0;
 
         int[] newRedSeeds = redSeeds.clone();
         int[] newBlackSeeds = blackSeeds.clone();
@@ -99,7 +99,7 @@ class GameState {
             while (numRedSeeds > 0) {
                 pos = (move.position + tracker) % 12;
                 if (pos != move.position) {
-                    if (tracker >= move.posSpecial && remainingSpecialSeeds > 0) {
+                    if (tracker + skipped >= move.posSpecial && remainingSpecialSeeds > 0) {
                         newSpecialSeeds[pos]++;
                         remainingSpecialSeeds--;
                         tracker++;
@@ -108,13 +108,13 @@ class GameState {
                     newRedSeeds[pos]++;
                     numRedSeeds--;
 
-                }
+                } else skipped++;
                 tracker++;
             }
             while (numBlackSeeds > 0) {
                 pos = (move.position + tracker) % 12;
                 if (pos != move.position) {
-                    if (tracker >= move.posSpecial && remainingSpecialSeeds > 0) {
+                    if (tracker + skipped >= move.posSpecial && remainingSpecialSeeds > 0) {
                         newSpecialSeeds[pos]++;
                         remainingSpecialSeeds--;
                         tracker++;
@@ -123,14 +123,14 @@ class GameState {
                     newBlackSeeds[pos]++;
                     numBlackSeeds--;
 
-                }
+                } else skipped++;
                 tracker++;
             }
         } else {
             while (numBlackSeeds > 0) {
                 pos = (move.position + tracker) % 12;
                 if (pos != move.position) {
-                    if (tracker >= move.posSpecial && remainingSpecialSeeds > 0) {
+                    if (tracker + skipped >= move.posSpecial && remainingSpecialSeeds > 0) {
                         newSpecialSeeds[pos]++;
                         remainingSpecialSeeds--;
                         tracker++;
@@ -139,13 +139,13 @@ class GameState {
                     newBlackSeeds[pos]++;
                     numBlackSeeds--;
 
-                }
+                } else skipped++;
                 tracker++;
             }
             while (numRedSeeds > 0) {
                 pos = (move.position + tracker) % 12;
                 if (pos != move.position) {
-                    if (tracker >= move.posSpecial && remainingSpecialSeeds > 0) {
+                    if (tracker + skipped >= move.posSpecial && remainingSpecialSeeds > 0) {
                         newSpecialSeeds[pos]++;
                         remainingSpecialSeeds--;
                         tracker++;
@@ -154,7 +154,7 @@ class GameState {
                     newRedSeeds[pos]++;
                     numRedSeeds--;
 
-                }
+                } else skipped++;
                 tracker++;
             }
         }
@@ -172,80 +172,89 @@ class GameState {
         newRedSeeds[move.position] = 0;
         newBlackSeeds[move.position] = 0;
         newSpecialSeeds[move.position] = 0;
-        lastPos = pos;
+        int lastPos = pos;
 
         if (print) {
             System.out.printf("Player %d plays move %s with %d seeds\n", playerNo, move.toString(), redSeeds[move.position] + blackSeeds[move.position] + specialSeeds[move.position]);
         }
-        GameState res;
-        res = capture(newRedSeeds, newBlackSeeds, newSpecialSeeds, lastPos, move.position, playerNo, getLastColor(move), print, rootMove);
 
-        return res;
-    }
-
-    public GameState capture(int[] redSeeds, int[] blackSeeds, int[] specialSeeds, int lastPos, int firstPos, int playerNo, Color lastColor, boolean print, Move rootMove) {
+        //CAPTURE BEGINS
+        Color lastColor = getLastColor(move);
 
         boolean fail = false;
-        int i = lastPos - firstPos;
+        int i = lastPos - move.position;
         if (i < 0) i += 12;
         int count = 0;
         while (!fail && (i >= 0)) {
-            if (playerNo == 1 && Math.floorMod((firstPos + i), 12) < 6) {
+            if (print) System.out.println("tour de boucle");
+            if (playerNo == 1 && Math.floorMod((move.position + i), 12) < 6) {
                 fail = true;
                 break;
-            } else if (playerNo == 2 && Math.floorMod((firstPos + i), 12) > 5) {
+            } else if (playerNo == 2 && Math.floorMod((move.position + i), 12) > 5) {
                 fail = true;
                 break;
             }
-            int pos = Math.floorMod((firstPos + i), 12);
+            int pos1 = Math.floorMod((move.position + i), 12);
             int hole;
             if (lastColor == Color.BLACK) {
-                hole = blackSeeds[pos] + specialSeeds[pos];
+                if (print) System.out.println("we checked black");
+                hole = newBlackSeeds[pos1] + newSpecialSeeds[pos1];
                 if (hole == 2 || hole == 3) {
                     int newcap = 0;
-                    newcap += blackSeeds[pos] + specialSeeds[pos];
-                    blackSeeds[pos] = 0;
-                    specialSeeds[pos] = 0;
-                    if (newcap > 0 && print) System.out.printf("Player %d captures %d black seeds from hole %d\n", playerNo, newcap, pos + 1);
+                    newcap += newBlackSeeds[pos1] + newSpecialSeeds[pos1];
+                    newBlackSeeds[pos1] = 0;
+                    newSpecialSeeds[pos1] = 0;
+                    if (newcap > 0 && print) System.out.printf("Player %d captures %d black seeds from hole %d\n", playerNo, newcap, pos1 + 1);
                     count += newcap;
                     i--;
                 } else fail = true;
             } else if (lastColor == Color.RED){
-                hole = redSeeds[pos] + specialSeeds[pos];
+                if (print) System.out.println("we checked red");
+                hole = newRedSeeds[pos1] + newSpecialSeeds[pos1];
                 if (hole == 2 || hole == 3) {
                     int newcap = 0;
-                    newcap += redSeeds[pos] + specialSeeds[pos];
-                    redSeeds[pos] = 0;
-                    specialSeeds[pos] = 0;
-                    if (newcap > 0 && print) System.out.printf("Player %d captures %d red seeds from hole %d\n", playerNo, newcap, pos + 1);
+                    newcap += newRedSeeds[pos1] + newSpecialSeeds[pos1];
+                    newRedSeeds[pos1] = 0;
+                    newSpecialSeeds[pos1] = 0;
+                    if (newcap > 0 && print) System.out.printf("Player %d captures %d red seeds from hole %d\n", playerNo, newcap, pos1 + 1);
                     count += newcap;
                     i--;
                 } else fail = true;
             } else {
-                int holeRed = redSeeds[pos] + specialSeeds[pos];
-                int holeBlack = blackSeeds[pos] + specialSeeds[pos];
+                if (print) System.out.printf("redseeds : " + newRedSeeds[pos1] + "\n");
+                if (print) System.out.printf("blackseeds : " + newBlackSeeds[pos1] + "\n");
+                if (print) System.out.printf("specialseeds : " + newSpecialSeeds[pos1] + "\n");
+                int holeRed = newRedSeeds[pos1] + newSpecialSeeds[pos1];
+                if (print) System.out.printf("holered : " + holeRed + "\n");
+                int holeBlack = newBlackSeeds[pos1] + newSpecialSeeds[pos1];
+                if (print) System.out.printf("holeblack : " + holeBlack + "\n");
                 int newcap = 0;
                 boolean redCap = false;
                 boolean blackCap = false;
                 if (holeRed == 2 || holeRed == 3 || holeBlack == 2 || holeBlack == 3) {
-                    newcap += specialSeeds[pos];
-                    specialSeeds[pos] = 0;
+                    if (print) System.out.println("we checked special");
+                    newcap += newSpecialSeeds[pos1];
+                    newSpecialSeeds[pos1] = 0;
                 }
                 if (holeRed == 2 || holeRed == 3) {
-                    newcap += redSeeds[pos];
-                    redSeeds[pos] = 0;
+                    newcap += newRedSeeds[pos1];
+                    newRedSeeds[pos1] = 0;
                     redCap = true;
+                    if (print) System.out.println("redcap is true");
                 }
                 if (holeBlack == 2 || holeBlack == 3) {
-                    newcap += blackSeeds[pos];
-                    blackSeeds[pos] = 0;
+                    newcap += newBlackSeeds[pos1];
+                    newBlackSeeds[pos1] = 0;
                     blackCap = true;
+                    if (print) System.out.println("blackcap is true");
                 }
-                if (newcap > 0 && print) System.out.printf("Player %d captures %d red or black seeds from hole %d\n", playerNo, newcap, pos);
+                if (newcap > 0 && print) System.out.printf("Player %d captures %d red or black seeds from hole %d\n", playerNo, newcap, pos1);
                 count += newcap;
                 i--;
+                if (print) System.out.printf("i : " + i + "\n");
                 if (redCap && blackCap) {
                     lastColor = Color.SPECIAL;
+                    if (print) System.out.println("set special");
                 } else if (redCap) {
                     lastColor = Color.RED;
                 } else if (blackCap) {
@@ -256,8 +265,9 @@ class GameState {
             }
         }
         GameState res;
-        if (playerNo == 1) res = new GameState(redSeeds, blackSeeds, specialSeeds, score1 + count, score2, rootMove);
-        else res = new GameState(redSeeds, blackSeeds, specialSeeds, score1, score2 + count, rootMove);
+        if (playerNo == 1) res = new GameState(newRedSeeds, newBlackSeeds, newSpecialSeeds, score1 + count, score2, rootMove);
+        else res = new GameState(newRedSeeds, newBlackSeeds, newSpecialSeeds, score1, score2 + count, rootMove);
+
         return res;
     }
 
