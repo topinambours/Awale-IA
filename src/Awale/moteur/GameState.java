@@ -24,8 +24,8 @@ public class GameState {
         redSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
         blackSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
 
-        //redSeeds = new int[]{0, 1, 0, 2, 6, 6, 2, 0, 10, 1, 6, 0};
-        //blackSeeds = new int[]{1, 1, 1, 1, 7, 6, 3, 2, 6, 0, 8, 0};
+        //redSeeds = new int[]{6, 5, 1, 3, 2, 1, 0, 0, 0, 0, 0, 0};
+        //blackSeeds = new int[]{0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0};
 
         //redSeeds = new int[]{3,3,3,3,3,0,2,2,2,2,2,3};
         //blackSeeds = new int[]{3,3,3,3,3,0,2,2,2,2,2,3};
@@ -252,7 +252,10 @@ public class GameState {
 
     int minimax(GameState node, Move bestMove, int depth, int playerNo, boolean maximisingPlayer, int alpha, int beta) {
         // CHECK IF TERMINAL OR LEAF NODE AND EVALUATE IF SO
-        if (playerNoMoves(node, playerNo)) return evalNoMoves(node, playerNo, maximisingPlayer);
+        if (playerNoMoves(node, nextPlayer(playerNo))) {
+            bestMove.set(starveMove(node, playerNo));
+            return evalNoMoves(node, playerNo, maximisingPlayer);
+        }
         //if (depth == 0 || gameOver(node)) return evalNode(node, playerNo, maximisingPlayer);
         if (depth == 0 || gameOver(node)) return advancedEval(node, playerNo, maximisingPlayer);
 
@@ -283,6 +286,15 @@ public class GameState {
         return (node.score1 > 37 || node.score2 > 37 || node.score1 == 37 && node.score2 == 37);
     }
 
+    Move starveMove(GameState node, int playerNo) {
+        List<Move> moves = node.legalMoves(playerNo);
+        for (Move move : moves) {
+            if (playerNoMoves(node.applyMove(move, nextPlayer(playerNo), false), nextPlayer(playerNo))) {
+                return move;
+            }
+        }
+        return moves.get(1);
+    }
 
     int evalNode(GameState node, int playerNo, boolean maximisingPlayer) {
         if (playerNo == 1 && maximisingPlayer || playerNo == 2 && !maximisingPlayer) {
@@ -297,6 +309,10 @@ public class GameState {
     }
 
     int advancedEval(GameState node, int playerNo, boolean maximisingPlayer) {
+        //if (playerNoMoves(node, nextPlayer(playerNo))) {
+        //    return 100000000;
+        //}
+
         boolean p1max = playerNo == 1 && maximisingPlayer || playerNo == 2 && !maximisingPlayer;
 
         int staticScore;
@@ -386,12 +402,12 @@ public class GameState {
         }
 
         if (playerNo == 1 && maximisingPlayer || playerNo == 2 && !maximisingPlayer) {
-            if (score1 >= 38) return 9999999;
-            else if (score2 >= 38) return -9999999;
+            if (score1 > score2) return 9999999;
+            else if (score2 > score1) return -9999999;
             else return score1 - score2;
         } else {
-            if (score2 >= 38) return 9999999;
-            else if (score1 >= 38) return -9999999;
+            if (score2 > score1) return 9999999;
+            else if (score1 > score2) return -9999999;
             else return score2 - score1;
         }
     }
