@@ -24,6 +24,9 @@ public class GameState {
         redSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
         blackSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
 
+        //redSeeds = new int[]{3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0};
+        //blackSeeds = new int[]{0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0};
+
         //redSeeds = new int[]{3,3,3,3,3,0,2,2,2,2,2,3};
         //blackSeeds = new int[]{3,3,3,3,3,0,2,2,2,2,2,3};
 
@@ -249,7 +252,7 @@ public class GameState {
 
     int minimax(GameState node, Move bestMove, int depth, int playerNo, boolean maximisingPlayer, int alpha, int beta) {
         // CHECK IF TERMINAL OR LEAF NODE AND EVALUATE IF SO
-        if (playerNoMoves(node)) return evalNoMoves(node, playerNo, maximisingPlayer);
+        if (playerNoMoves(node, playerNo)) return evalNoMoves(node, playerNo, maximisingPlayer);
         //if (depth == 0 || gameOver(node)) return evalNode(node, playerNo, maximisingPlayer);
         if (depth == 0 || gameOver(node)) return advancedEval(node, playerNo, maximisingPlayer);
 
@@ -360,7 +363,7 @@ public class GameState {
         return oppScore;
     }
 
-    static boolean playerNoMoves(GameState node) {
+    static boolean playerNoMoves(GameState node, int playerNo) {
         int acc1 = 0;
         int acc2 = 0;
         for (int i = 0; i <= 5; i++) {
@@ -368,7 +371,8 @@ public class GameState {
             int j = i + 6;
             acc2 += node.redSeeds[j] + node.blackSeeds[j] + node.specialSeeds[j];
         }
-        return (acc1 == 0 || acc2 == 0);
+        if (playerNo == 1) return (acc1 == 0);
+        else return (acc2 == 0);
     }
 
     int evalNoMoves(GameState node, int playerNo, boolean maximisingPlayer) {

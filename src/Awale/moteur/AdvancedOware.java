@@ -55,7 +55,7 @@ public class AdvancedOware {
         Move bestMove = new Move();
 
         while (!GameState.gameOver(game)) {
-            if (GameState.playerNoMoves(game)) {
+            if (GameState.playerNoMoves(game, currentPlayer)) {
                 game.captureNoMoves();
                 break;
             }
