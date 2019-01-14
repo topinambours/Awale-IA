@@ -1,18 +1,15 @@
 package Awale.moteur;
 
-
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-class GameState {
-    public int[] redSeeds;
-    public int[] blackSeeds;
-    public int[] specialSeeds;
-    public int score1;
-    public int score2;
-    public Move rootMove;
+public class GameState {
+    int[] redSeeds;
+    int[] blackSeeds;
+    int[] specialSeeds;
+    int score1;
+    int score2;
 
     public GameState() {
         redSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
@@ -20,35 +17,30 @@ class GameState {
         specialSeeds = new int[]{1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0};
         score1 = 0;
         score2 = 0;
-        rootMove = null;
     }
 
-
-    public GameState(int[] specialSeeds){
+    GameState(int[] specialSeeds){
 
         redSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
         blackSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
-        /*
-        redSeeds = new int[]{0,0,0,0,12,13,0,3,0,0,1,0};
-        blackSeeds = new int[]{0,0,0,0,9,9,0,1,0,1,0,0};
-        */
-        //blackSeeds = new int[]{3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1};
+
+        //redSeeds = new int[]{3,3,3,3,3,0,2,2,2,2,2,3};
+        //blackSeeds = new int[]{3,3,3,3,3,0,2,2,2,2,2,3};
+
         this.specialSeeds = specialSeeds;
         score1 = 0;
         score2 = 0;
-        rootMove = null;
     }
 
-    public GameState(int[] redSeeds, int[] blackSeeds, int[] specialSeeds, int score1, int score2, Move rootMove) {
+    GameState(int[] redSeeds, int[] blackSeeds, int[] specialSeeds, int score1, int score2) {
         this.redSeeds = redSeeds;
         this.blackSeeds = blackSeeds;
         this.specialSeeds = specialSeeds;
         this.score1 = score1;
         this.score2 = score2;
-        this.rootMove = rootMove;
     }
 
-    public List<Move> legalMoves(int playerNo) {
+    List<Move> legalMoves(int playerNo) {
         ArrayList<Move> res = new ArrayList<>();
         int offset = 6 * (playerNo - 1);
 
@@ -80,9 +72,9 @@ class GameState {
         return res;
     }
 
-    public GameState applyMove(Move move, int playerNo, boolean print, Move rootMove) {
-        int lastPos;
+    GameState applyMove(Move move, int playerNo, boolean print) {
         int tracker = 1;
+        int skipped = 0;
 
         int[] newRedSeeds = redSeeds.clone();
         int[] newBlackSeeds = blackSeeds.clone();
@@ -99,7 +91,7 @@ class GameState {
             while (numRedSeeds > 0) {
                 pos = (move.position + tracker) % 12;
                 if (pos != move.position) {
-                    if (tracker >= move.posSpecial && remainingSpecialSeeds > 0) {
+                    if (tracker + skipped >= move.posSpecial && remainingSpecialSeeds > 0) {
                         newSpecialSeeds[pos]++;
                         remainingSpecialSeeds--;
                         tracker++;
@@ -108,13 +100,13 @@ class GameState {
                     newRedSeeds[pos]++;
                     numRedSeeds--;
 
-                }
+                } else skipped++;
                 tracker++;
             }
             while (numBlackSeeds > 0) {
                 pos = (move.position + tracker) % 12;
                 if (pos != move.position) {
-                    if (tracker >= move.posSpecial && remainingSpecialSeeds > 0) {
+                    if (tracker + skipped >= move.posSpecial && remainingSpecialSeeds > 0) {
                         newSpecialSeeds[pos]++;
                         remainingSpecialSeeds--;
                         tracker++;
@@ -123,14 +115,14 @@ class GameState {
                     newBlackSeeds[pos]++;
                     numBlackSeeds--;
 
-                }
+                } else skipped++;
                 tracker++;
             }
         } else {
             while (numBlackSeeds > 0) {
                 pos = (move.position + tracker) % 12;
                 if (pos != move.position) {
-                    if (tracker >= move.posSpecial && remainingSpecialSeeds > 0) {
+                    if (tracker + skipped >= move.posSpecial && remainingSpecialSeeds > 0) {
                         newSpecialSeeds[pos]++;
                         remainingSpecialSeeds--;
                         tracker++;
@@ -139,13 +131,13 @@ class GameState {
                     newBlackSeeds[pos]++;
                     numBlackSeeds--;
 
-                }
+                } else skipped++;
                 tracker++;
             }
             while (numRedSeeds > 0) {
                 pos = (move.position + tracker) % 12;
                 if (pos != move.position) {
-                    if (tracker >= move.posSpecial && remainingSpecialSeeds > 0) {
+                    if (tracker + skipped >= move.posSpecial && remainingSpecialSeeds > 0) {
                         newSpecialSeeds[pos]++;
                         remainingSpecialSeeds--;
                         tracker++;
@@ -154,7 +146,7 @@ class GameState {
                     newRedSeeds[pos]++;
                     numRedSeeds--;
 
-                }
+                } else skipped++;
                 tracker++;
             }
         }
@@ -172,76 +164,69 @@ class GameState {
         newRedSeeds[move.position] = 0;
         newBlackSeeds[move.position] = 0;
         newSpecialSeeds[move.position] = 0;
-        lastPos = pos;
 
         if (print) {
             System.out.printf("Player %d plays move %s with %d seeds\n", playerNo, move.toString(), redSeeds[move.position] + blackSeeds[move.position] + specialSeeds[move.position]);
         }
-        GameState res;
-        res = capture(newRedSeeds, newBlackSeeds, newSpecialSeeds, lastPos, move.position, playerNo, getLastColor(move), print, rootMove);
 
-        return res;
-    }
-
-    public GameState capture(int[] redSeeds, int[] blackSeeds, int[] specialSeeds, int lastPos, int firstPos, int playerNo, Color lastColor, boolean print, Move rootMove) {
+        //CAPTURE BEGINS
+        Color lastColor = getLastColor(move);
 
         boolean fail = false;
-        int i = lastPos - firstPos;
+        int i = pos - move.position;
         if (i < 0) i += 12;
         int count = 0;
         while (!fail && (i >= 0)) {
-            if (playerNo == 1 && Math.floorMod((firstPos + i), 12) < 6) {
-                fail = true;
+            if (playerNo == 1 && Math.floorMod((move.position + i), 12) < 6) {
                 break;
-            } else if (playerNo == 2 && Math.floorMod((firstPos + i), 12) > 5) {
-                fail = true;
+            } else if (playerNo == 2 && Math.floorMod((move.position + i), 12) > 5) {
                 break;
             }
-            int pos = Math.floorMod((firstPos + i), 12);
+            int capturePos = Math.floorMod((move.position + i), 12);
             int hole;
             if (lastColor == Color.BLACK) {
-                hole = blackSeeds[pos] + specialSeeds[pos];
+                hole = newBlackSeeds[capturePos] + newSpecialSeeds[capturePos];
                 if (hole == 2 || hole == 3) {
                     int newcap = 0;
-                    newcap += blackSeeds[pos] + specialSeeds[pos];
-                    blackSeeds[pos] = 0;
-                    specialSeeds[pos] = 0;
-                    if (newcap > 0 && print) System.out.printf("Player %d captures %d black seeds from hole %d\n", playerNo, newcap, pos + 1);
+                    newcap += newBlackSeeds[capturePos] + newSpecialSeeds[capturePos];
+                    newBlackSeeds[capturePos] = 0;
+                    newSpecialSeeds[capturePos] = 0;
+                    if (newcap > 0 && print) System.out.printf("Player %d captures %d black seeds from hole %d\n", playerNo, newcap, capturePos + 1);
                     count += newcap;
                     i--;
                 } else fail = true;
             } else if (lastColor == Color.RED){
-                hole = redSeeds[pos] + specialSeeds[pos];
+                hole = newRedSeeds[capturePos] + newSpecialSeeds[capturePos];
                 if (hole == 2 || hole == 3) {
                     int newcap = 0;
-                    newcap += redSeeds[pos] + specialSeeds[pos];
-                    redSeeds[pos] = 0;
-                    specialSeeds[pos] = 0;
-                    if (newcap > 0 && print) System.out.printf("Player %d captures %d red seeds from hole %d\n", playerNo, newcap, pos + 1);
+                    newcap += newRedSeeds[capturePos] + newSpecialSeeds[capturePos];
+                    newRedSeeds[capturePos] = 0;
+                    newSpecialSeeds[capturePos] = 0;
+                    if (newcap > 0 && print) System.out.printf("Player %d captures %d red seeds from hole %d\n", playerNo, newcap, capturePos + 1);
                     count += newcap;
                     i--;
                 } else fail = true;
             } else {
-                int holeRed = redSeeds[pos] + specialSeeds[pos];
-                int holeBlack = blackSeeds[pos] + specialSeeds[pos];
+                int holeRed = newRedSeeds[capturePos] + newSpecialSeeds[capturePos];
+                int holeBlack = newBlackSeeds[capturePos] + newSpecialSeeds[capturePos];
                 int newcap = 0;
                 boolean redCap = false;
                 boolean blackCap = false;
                 if (holeRed == 2 || holeRed == 3 || holeBlack == 2 || holeBlack == 3) {
-                    newcap += specialSeeds[pos];
-                    specialSeeds[pos] = 0;
+                    newcap += newSpecialSeeds[capturePos];
+                    newSpecialSeeds[capturePos] = 0;
                 }
                 if (holeRed == 2 || holeRed == 3) {
-                    newcap += redSeeds[pos];
-                    redSeeds[pos] = 0;
+                    newcap += newRedSeeds[capturePos];
+                    newRedSeeds[capturePos] = 0;
                     redCap = true;
                 }
                 if (holeBlack == 2 || holeBlack == 3) {
-                    newcap += blackSeeds[pos];
-                    blackSeeds[pos] = 0;
+                    newcap += newBlackSeeds[capturePos];
+                    newBlackSeeds[capturePos] = 0;
                     blackCap = true;
                 }
-                if (newcap > 0 && print) System.out.printf("Player %d captures %d red or black seeds from hole %d\n", playerNo, newcap, pos);
+                if (newcap > 0 && print) System.out.printf("Player %d captures %d red or black seeds from hole %d\n", playerNo, newcap, capturePos);
                 count += newcap;
                 i--;
                 if (redCap && blackCap) {
@@ -256,101 +241,126 @@ class GameState {
             }
         }
         GameState res;
-        if (playerNo == 1) res = new GameState(redSeeds, blackSeeds, specialSeeds, score1 + count, score2, rootMove);
-        else res = new GameState(redSeeds, blackSeeds, specialSeeds, score1, score2 + count, rootMove);
+        if (playerNo == 1) res = new GameState(newRedSeeds, newBlackSeeds, newSpecialSeeds, score1 + count, score2);
+        else res = new GameState(newRedSeeds, newBlackSeeds, newSpecialSeeds, score1, score2 + count);
+
         return res;
     }
 
-    public MinimaxResult minimax(GameState node, int depth, int playerNo, boolean maximisingPlayer, boolean first, int alpha, int beta) {
-        if (playerNoMoves(node)) return new MinimaxResult(evalNoMoves(node, playerNo, maximisingPlayer), node.rootMove);
-        if (depth == 0 || gameOver(node)) return new MinimaxResult(evalNode(node, playerNo, maximisingPlayer), node.rootMove);
-        List<GameState> newNodes = new ArrayList<>();
+    int minimax(GameState node, Move bestMove, int depth, int playerNo, boolean maximisingPlayer, int alpha, int beta) {
+        // CHECK IF TERMINAL OR LEAF NODE AND EVALUATE IF SO
+        if (playerNoMoves(node)) return evalNoMoves(node, playerNo, maximisingPlayer);
+        //if (depth == 0 || gameOver(node)) return evalNode(node, playerNo, maximisingPlayer);
+        if (depth == 0 || gameOver(node)) return advancedEval(node, playerNo, maximisingPlayer);
+
+        // APPLY POSSIBLE MOVES TO CURRENT NODES TO GENERATE LIST OF CHILD NODES
         List<Move> moves = node.legalMoves(playerNo);
+
+        Move garbage = new Move();
+
         for (Move move : moves) {
-            GameState newNode; //= applyMove(move, playerNo, false);
-            if (first) newNode = applyMove(move, playerNo, false, move);
-            else newNode = applyMove(move, playerNo, false, node.rootMove);
-            newNodes.add(newNode);
-        }
-        /*List<MinimaxResult> moveResults = new ArrayList<>();
-        for (GameState nextNode : newNodes) {
-            moveResults.add(minimax(nextNode, depth - 1, nextPlayer(playerNo), !maximisingPlayer, false));
-        }
+            History.save(node);
+            node = node.applyMove(move, playerNo, false);
+            int score = - minimax(node, garbage, depth - 1, nextPlayer(playerNo), !maximisingPlayer, -beta, -alpha);
+            node = History.restore();
 
-        MinimaxResult res = new MinimaxResult(0, moves.get(0));
-        if (maximisingPlayer) {
-            int val = -10000;
-            for (int i = 0; i < moveResults.size(); i++) {
-                MinimaxResult newValue = moveResults.get(i);
-                if (newValue.valeur > val) {
-                    val = newValue.valeur;
-                    res = newValue;
-                }
+            if (score > alpha) {
+                alpha = score;
+                bestMove.set(move);
             }
-        } else {
-            int val = 10000;
-            for (int i = 0; i < moveResults.size(); i++) {
-                MinimaxResult newValue = moveResults.get(i);
-                if (newValue.valeur < val) {
-                    val = newValue.valeur;
-                    res = newValue;
-                }
-            }
-        }*/
-        MinimaxResult res = new MinimaxResult(0, moves.get(0));
-        ArrayList<Integer> values = new ArrayList<>();
-        if (maximisingPlayer) {
-            int val = -10000;
-            for (GameState nextNode : newNodes) {
-                MinimaxResult newResult = minimax(nextNode, depth - 1, nextPlayer(playerNo), false, false, alpha, beta);
-                if (first) {
-                    values.add(newResult.valeur);
-                }
-                if (newResult.valeur > val) {
-                    val = newResult.valeur;
-                    res = newResult;
-                }
-                alpha = Math.max(alpha, val);
-                if (val >= beta) break;
-            }
-        } else {
-            int val = 10000;
-            for (GameState nextNode : newNodes) {
-                MinimaxResult newResult = minimax(nextNode, depth - 1, nextPlayer(playerNo), true, false, alpha, beta);
-                if (first) values.add(newResult.valeur);
-                if (newResult.valeur < val) {
-                    val = newResult.valeur;
-                    res = newResult;
-                }
-                beta = Math.min(beta, val);
-                if (alpha >= val) break;
+
+            if (alpha >= beta) {
+                break;
             }
         }
-        if (first) System.out.println(Arrays.toString(values.toArray()));
-        return res;
+        return alpha;
     }
 
-    public void setRootMove(Move rootMove) {
-        this.rootMove = rootMove;
-    }
-
-    public static boolean gameOver(GameState node) {
+    static boolean gameOver(GameState node) {
         return (node.score1 > 37 || node.score2 > 37 || node.score1 == 37 && node.score2 == 37);
     }
 
-    public int evalNode(GameState node, int playerNo, boolean maximisingPlayer) {
+
+    int evalNode(GameState node, int playerNo, boolean maximisingPlayer) {
         if (playerNo == 1 && maximisingPlayer || playerNo == 2 && !maximisingPlayer) {
-            if (node.score1 >= 38) return 100;
-            else if (node.score2 >= 38) return -100;
+            if (node.score1 >= 38) return 10000000;
+            else if (node.score2 >= 38) return -10000000;
             else return node.score1 - node.score2;
         } else {
-            if (node.score2 >= 38) return 100;
-            else if (node.score1 >= 38) return -100;
+            if (node.score2 >= 38) return 10000000;
+            else if (node.score1 >= 38) return -10000000;
             else return node.score2 - node.score1;
         }
     }
 
-    public static boolean playerNoMoves(GameState node) {
+    int advancedEval(GameState node, int playerNo, boolean maximisingPlayer) {
+        boolean p1max = playerNo == 1 && maximisingPlayer || playerNo == 2 && !maximisingPlayer;
+
+        int staticScore;
+        int staticWeight = 100;
+        if (p1max) {
+            if (node.score1 >= 38) staticScore = 10000000;
+            else if (node.score2 >= 38) staticScore = -10000000;
+            else staticScore =  staticWeight * node.score1;
+        } else {
+            if (node.score2 >= 38) staticScore = 10000000;
+            else if (node.score1 >= 38) staticScore = -10000000;
+            else staticScore =  staticWeight * node.score2;
+        }
+
+        int maxPitWeight = 20;
+        int maxPit = maxPitWeight * countMaxPit(node, playerNo);
+
+        int seedWeight = 19;
+        int seedsOnSide = seedWeight * countSeedsOnSide(node, playerNo);
+
+        int pitsWeight = 37;
+        int playablePits = pitsWeight * countPlayablePits(node, playerNo);
+
+        int opponentScoreWeight = 57;
+        int opponentScore = opponentScoreWeight * opponentCounterMove(node, playerNo);
+
+        return staticScore + maxPit + seedsOnSide + playablePits + opponentScore;
+    }
+
+    int countMaxPit(GameState node, int playerNo) {
+        int count = 0;
+        for (int i = 6 * (playerNo - 1); i < 6 * playerNo; i++) {
+            count = Math.max(count, node.blackSeeds[i] + node.redSeeds[i] + node.specialSeeds[i]);
+        }
+        return count;
+    }
+
+    int countSeedsOnSide(GameState node, int playerNo) {
+        int acc = 0;
+        for (int i = 6 * (playerNo - 1); i < 6 * playerNo; i++) {
+            acc += node.blackSeeds[i] + node.redSeeds[i] + node.specialSeeds[i];
+        }
+        return acc;
+    }
+
+    int countPlayablePits(GameState node, int playerNo) {
+        int count = 0;
+        for (int i = 6 * (playerNo - 1); i < 6 * playerNo; i++) {
+            if (node.blackSeeds[i] + node.redSeeds[i] + node.specialSeeds[i] > 0) count++;
+        }
+        return count;
+    }
+
+    int opponentCounterMove(GameState node, int playerNo) {
+        List<Move> moves = node.legalMoves(nextPlayer(playerNo));
+        int oppScore = 0;
+        for (Move move : moves) {
+            if (playerNo == 1) {
+                oppScore = -Math.max(oppScore, node.applyMove(move, 2, false).score2);
+            } else {
+                oppScore = -Math.max(oppScore, node.applyMove(move, 1, false).score1);
+            }
+        }
+        return oppScore;
+    }
+
+    static boolean playerNoMoves(GameState node) {
         int acc1 = 0;
         int acc2 = 0;
         for (int i = 0; i <= 5; i++) {
@@ -361,7 +371,7 @@ class GameState {
         return (acc1 == 0 || acc2 == 0);
     }
 
-    public int evalNoMoves(GameState node, int playerNo, boolean maximisingPlayer) {
+    int evalNoMoves(GameState node, int playerNo, boolean maximisingPlayer) {
         int score1 = node.score1;
         int score2 = node.score2;
 
@@ -372,17 +382,17 @@ class GameState {
         }
 
         if (playerNo == 1 && maximisingPlayer || playerNo == 2 && !maximisingPlayer) {
-            if (score1 >= 38) return 100;
-            else if (score2 >= 38) return -100;
+            if (score1 >= 38) return 9999999;
+            else if (score2 >= 38) return -9999999;
             else return score1 - score2;
         } else {
-            if (score2 >= 38) return 100;
-            else if (score1 >= 38) return -100;
+            if (score2 >= 38) return 9999999;
+            else if (score1 >= 38) return -9999999;
             else return score2 - score1;
         }
     }
 
-    public void captureNoMoves() {
+    void captureNoMoves() {
         for (int i = 0; i <= 5; i++) {
             score1 += redSeeds[i] + blackSeeds[i] + specialSeeds[i];
             redSeeds[i] = 0;
@@ -396,12 +406,12 @@ class GameState {
         }
     }
 
-    public static int nextPlayer(int playerNo) {
+    static int nextPlayer(int playerNo) {
         if (playerNo == 1) return 2;
         else return 1;
     }
 
-    public Color getLastColor(Move move) {
+    Color getLastColor(Move move) {
         if (move.posSpecial > redSeeds[move.position] + blackSeeds[move.position]) return Color.SPECIAL;
         if (move.redFirst) {
             if (blackSeeds[move.position] > 0) return Color.BLACK;
@@ -420,7 +430,6 @@ class GameState {
                 ", specialSeeds=" + Arrays.toString(specialSeeds) +
                 ", score1=" + score1 +
                 ", score2=" + score2 +
-                ", rootMove=" + rootMove +
                 '}';
     }
 }

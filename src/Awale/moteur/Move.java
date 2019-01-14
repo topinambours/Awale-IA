@@ -1,18 +1,17 @@
 package Awale.moteur;
 
-class Move{
-    public final int position;
-    public final boolean redFirst;
-    public final int posSpecial;
+public class Move{
+    int position;
+    boolean redFirst;
+    int posSpecial;
 
-    public Move(int position, boolean redFirst, int posSpecial) {
+    Move(int position, boolean redFirst, int posSpecial) {
         this.position = position;
         this.redFirst = redFirst;
         this.posSpecial = posSpecial;
     }
 
-    public Move(String str) {
-
+    Move(String str) {
         String[] part = str.split("(?<=\\D)(?=\\d)");
         this.posSpecial = Integer.parseInt(part[1]);//special
 
@@ -21,10 +20,16 @@ class Move{
         this.redFirst =  part2[1].equals("R");//color
     }
 
-    public Move() {
+    Move() {
         position = -1;
         redFirst = false;
         posSpecial = 0;
+    }
+
+    void set(Move move) {
+        this.position = move.position;
+        this.posSpecial = move.posSpecial;
+        this.redFirst = move.redFirst;
     }
 
     private String letter() {
