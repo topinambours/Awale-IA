@@ -24,8 +24,8 @@ public class GameState {
         redSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
         blackSeeds = new int[]{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
 
-        //redSeeds = new int[]{3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0};
-        //blackSeeds = new int[]{0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0};
+        //redSeeds = new int[]{0, 1, 0, 2, 6, 6, 2, 0, 10, 1, 6, 0};
+        //blackSeeds = new int[]{1, 1, 1, 1, 7, 6, 3, 2, 6, 0, 8, 0};
 
         //redSeeds = new int[]{3,3,3,3,3,0,2,2,2,2,2,3};
         //blackSeeds = new int[]{3,3,3,3,3,0,2,2,2,2,2,3};
@@ -94,7 +94,7 @@ public class GameState {
             while (numRedSeeds > 0) {
                 pos = (move.position + tracker) % 12;
                 if (pos != move.position) {
-                    if (tracker + skipped >= move.posSpecial && remainingSpecialSeeds > 0) {
+                    if (tracker >= move.posSpecial + skipped && remainingSpecialSeeds > 0) {
                         newSpecialSeeds[pos]++;
                         remainingSpecialSeeds--;
                         tracker++;
@@ -109,7 +109,7 @@ public class GameState {
             while (numBlackSeeds > 0) {
                 pos = (move.position + tracker) % 12;
                 if (pos != move.position) {
-                    if (tracker + skipped >= move.posSpecial && remainingSpecialSeeds > 0) {
+                    if (tracker >= move.posSpecial + skipped && remainingSpecialSeeds > 0) {
                         newSpecialSeeds[pos]++;
                         remainingSpecialSeeds--;
                         tracker++;
@@ -125,7 +125,7 @@ public class GameState {
             while (numBlackSeeds > 0) {
                 pos = (move.position + tracker) % 12;
                 if (pos != move.position) {
-                    if (tracker + skipped >= move.posSpecial && remainingSpecialSeeds > 0) {
+                    if (tracker >= move.posSpecial + skipped && remainingSpecialSeeds > 0) {
                         newSpecialSeeds[pos]++;
                         remainingSpecialSeeds--;
                         tracker++;
@@ -140,7 +140,7 @@ public class GameState {
             while (numRedSeeds > 0) {
                 pos = (move.position + tracker) % 12;
                 if (pos != move.position) {
-                    if (tracker + skipped >= move.posSpecial && remainingSpecialSeeds > 0) {
+                    if (tracker >= move.posSpecial + skipped && remainingSpecialSeeds > 0) {
                         newSpecialSeeds[pos]++;
                         remainingSpecialSeeds--;
                         tracker++;
@@ -161,7 +161,7 @@ public class GameState {
                     remainingSpecialSeeds--;
 
                 }
-            }
+            } else skipped++;
             tracker++;
         }
         newRedSeeds[move.position] = 0;

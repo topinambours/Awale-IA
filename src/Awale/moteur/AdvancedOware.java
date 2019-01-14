@@ -60,15 +60,16 @@ public class AdvancedOware {
                 break;
             }
             if (robotPlay) {
-                System.out.println(Arrays.toString(game.legalMoves(currentPlayer).toArray()));
+                //System.out.println(Arrays.toString(game.legalMoves(currentPlayer).toArray()));
                 expected = game.minimax(game, bestMove, getDeph(game), currentPlayer, true, -10000, 10000);
                 System.out.printf("expected value : %d\n", expected);
             } else {
-                System.out.println(game.toString());
+                //System.out.println(game.toString());
                 bestMove = nextRequest(game);
             }
 
             game = game.applyMove(bestMove, currentPlayer, true);
+            System.out.println(game.toString());
             currentPlayer = GameState.nextPlayer(currentPlayer);
             robotPlay = !robotPlay;
 
